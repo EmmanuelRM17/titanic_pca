@@ -1,358 +1,340 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clasificador de Insectos</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictor de Precio de Circonia</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background: #ffffff;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .container {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        max-width: 500px;
-        width: 100%;
-        border: 1px solid #e5e5e5;
-      }
-
-      h1 {
-        text-align: center;
-        color: #2c3e50;
-        margin-bottom: 30px;
-        font-size: 2.2em;
-        font-weight: 400;
-        letter-spacing: -0.5px;
-      }
-
-      .form-group {
-        margin-bottom: 24px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #34495e;
-        font-size: 1rem;
-      }
-
-      input[type="text"] {
-        width: 100%;
-        padding: 16px;
-        border: 2px solid #e1e8ed;
-        border-radius: 6px;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        background: #ffffff;
-        box-sizing: border-box;
-      }
-
-      input[type="text"]:focus {
-        outline: none;
-        border-color: #2c3e50;
-        background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
-      }
-
-      input[type="submit"] {
-        width: 100%;
-        padding: 18px;
-        background: #2c3e50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 18px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      input[type="submit"]:hover {
-        background: #34495e;
-        transform: translateY(-1px);
-      }
-
-      input[type="submit"]:active {
-        transform: translateY(0);
-      }
-
-      input[type="submit"]:disabled {
-        background: #bdc3c7;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      #resultado {
-        margin-top: 24px;
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 1.1em;
-        border: 2px solid transparent;
-        transition: all 0.4s ease;
-        display: none;
-      }
-
-      .loading {
-        background: #f8f9fa;
-        color: #6c757d;
-        border-color: #dee2e6;
-        animation: pulse 1.5s infinite;
-      }
-
-      .success {
-        background: #d4edda;
-        color: #155724;
-        border-color: #c3e6cb;
-        animation: slideIn 0.5s ease;
-      }
-
-      .error {
-        background: #f8d7da;
-        color: #721c24;
-        border-color: #f5c6cb;
-        animation: slideIn 0.5s ease;
-      }
-
-      @keyframes pulse {
-        0% {
-          opacity: 0.6;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        50% {
-          opacity: 1;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        100% {
-          opacity: 0.6;
-        }
-      }
-
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #6c757d;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-right: 10px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      @media (max-width: 600px) {
         .container {
-          padding: 20px;
-          margin: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         h1 {
-          font-size: 1.8em;
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 32px;
+            font-size: 1.875rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
-      }
-    </style>
-  </head>
 
-  <body>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #2d3748;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .btn-predict {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 24px;
+        }
+
+        .btn-predict:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-predict:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+
+        .result.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .result.error {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
+        }
+
+        .result.loading {
+            background: #f7fafc;
+            color: #718096;
+            border: 2px solid #e2e8f0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px;
+                margin: 16px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
     <div class="container">
-      <h1>Predicción de Precio de Zirconia</h1>
-      <form id="formulario" onsubmit="predecirPrecio(event)">
-        <div class="form-group">
-          <label for="carat">Carat:</label>
-          <input
-            type="text"
-            id="carat"
-            name="carat"
-            placeholder="Ej: 0.7"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="depth">Depth:</label>
-          <input
-            type="text"
-            id="depth"
-            name="depth"
-            placeholder="Ej: 61.5"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="table">Table:</label>
-          <input
-            type="text"
-            id="table"
-            name="table"
-            placeholder="Ej: 55"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="volume">Volumen:</label>
-          <input
-            type="text"
-            id="volume"
-            name="volume"
-            placeholder="Ej: 360"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="cut_encoded">Cut (codificado):</label>
-          <input
-            type="text"
-            id="cut_encoded"
-            name="cut_encoded"
-            placeholder="Ej: 2"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="color_encoded">Color (codificado):</label>
-          <input
-            type="text"
-            id="color_encoded"
-            name="color_encoded"
-            placeholder="Ej: 4"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="clarity_encoded">Clarity (codificado):</label>
-          <input
-            type="text"
-            id="clarity_encoded"
-            name="clarity_encoded"
-            placeholder="Ej: 6"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="modelo">Modelo:</label>
-          <select id="modelo" name="modelo">
-            <option value="rf">Random Forest</option>
-            <option value="mlp">Red Neuronal</option>
-          </select>
-        </div>
-        <input type="submit" value="Predecir Precio" />
-      </form>
-      <div id="resultado"></div>
+        <h1>Predictor de Precio de Circonia</h1>
+        <form id="formulario">
+            <div class="grid">
+                <div class="form-group">
+                    <label for="carat">Quilates</label>
+                    <input type="number" id="carat" step="0.01" min="0.1" max="5" placeholder="0.50" required>
+                </div>
+                <div class="form-group">
+                    <label for="depth">Profundidad</label>
+                    <input type="number" id="depth" step="0.1" min="40" max="80" placeholder="61.5" required>
+                </div>
+                <div class="form-group">
+                    <label for="table">Mesa</label>
+                    <input type="number" id="table" step="0.1" min="40" max="80" placeholder="55.0" required>
+                </div>
+                <div class="form-group">
+                    <label for="x">Longitud (mm)</label>
+                    <input type="number" id="x" step="0.01" min="1" max="15" placeholder="4.05" required>
+                </div>
+                <div class="form-group">
+                    <label for="y">Anchura (mm)</label>
+                    <input type="number" id="y" step="0.01" min="1" max="15" placeholder="4.07" required>
+                </div>
+                <div class="form-group">
+                    <label for="z">Altura (mm)</label>
+                    <input type="number" id="z" step="0.01" min="1" max="10" placeholder="2.31" required>
+                </div>
+                <div class="form-group">
+                    <label for="cut">Tipo de Corte</label>
+                    <select id="cut" required>
+                        <option value="">Seleccionar corte</option>
+                        <option value="Fair">Fair</option>
+                        <option value="Good">Good</option>
+                        <option value="Very Good">Very Good</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Ideal">Ideal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <select id="color" required>
+                        <option value="">Seleccionar color</option>
+                        <option value="D">D (Incoloro)</option>
+                        <option value="E">E (Incoloro)</option>
+                        <option value="F">F (Incoloro)</option>
+                        <option value="G">G (Casi incoloro)</option>
+                        <option value="H">H (Casi incoloro)</option>
+                        <option value="I">I (Casi incoloro)</option>
+                        <option value="J">J (Casi incoloro)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clarity">Claridad</label>
+                    <select id="clarity" required>
+                        <option value="">Seleccionar claridad</option>
+                        <option value="I1">I1 (Imperfecciones visibles)</option>
+                        <option value="SI2">SI2 (Pequeñas imperfecciones)</option>
+                        <option value="SI1">SI1 (Pequeñas imperfecciones)</option>
+                        <option value="VS2">VS2 (Muy pequeñas imperfecciones)</option>
+                        <option value="VS1">VS1 (Muy pequeñas imperfecciones)</option>
+                        <option value="VVS2">VVS2 (Imperfecciones muy, muy pequeñas)</option>
+                        <option value="VVS1">VVS1 (Imperfecciones muy, muy pequeñas)</option>
+                        <option value="IF">IF (Internamente perfecto)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modelo">Modelo de predicción</label>
+                    <select id="modelo">
+                        <option value="rf">Random Forest</option>
+                        <option value="mlp">Red Neuronal</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-predict">Predecir Precio</button>
+        </form>
+        <div id="resultado" class="result"></div>
     </div>
 
     <script>
-      function predecirPrecio(event) {
-        event.preventDefault();
-
-        const form = document.getElementById("formulario");
-        const data = new FormData(form);
-        const resultado = document.getElementById("resultado");
-        const submitBtn = form.querySelector('input[type="submit"]');
-
-        // Animación de carga
-        submitBtn.disabled = true;
-        submitBtn.value = "Calculando...";
-        mostrarResultado(
-          '<div class="spinner"></div>Calculando precio...',
-          "loading"
-        );
-
-        fetch("/predict", {
-          method: "POST",
-          body: new URLSearchParams(data),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            setTimeout(() => {
-              if (data.error) {
-                mostrarResultado("Error: " + data.error, "error");
-              } else {
-                mostrarResultado(
-                  `✓ Precio estimado: <strong>$${data.precio_estimado.toFixed(
-                    2
-                  )}</strong>`,
-                  "success"
-                );
-              }
-              resetButton();
-            }, 800);
-          })
-          .catch((error) => {
-            setTimeout(() => {
-              mostrarResultado(
-                "Error de conexión. Intenta nuevamente.",
-                "error"
-              );
-              resetButton();
-            }, 800);
-            console.error("Error:", error);
-          });
-      }
-
-      function mostrarResultado(mensaje, tipo) {
-        const resultado = document.getElementById("resultado");
-        resultado.innerHTML = mensaje;
-        resultado.className = tipo;
-        resultado.style.display = "block";
-      }
-
-      function resetButton() {
-        const submitBtn = document.querySelector('input[type="submit"]');
-        submitBtn.disabled = false;
-        submitBtn.value = "Predecir Precio";
-      }
-
-      // Limpiar resultado al cambiar cualquier input o select
-      document
-        .querySelectorAll("input[type='text'], select")
-        .forEach((element) => {
-          element.addEventListener("input", function () {
-            const resultado = document.getElementById("resultado");
-            if (resultado.style.display !== "none") {
-              resultado.style.opacity = "0.5";
-            }
-          });
+        // Manejar la predicción del precio
+        function predecirPrecio(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('formulario');
+            const resultado = document.getElementById('resultado');
+            const submitBtn = form.querySelector('.btn-predict');
+            
+            // Preparar datos del formulario
+            const formData = new FormData();
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                formData.append(input.name || input.id, input.value);
+            });
+            
+            // Estado de carga
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Procesando...';
+            mostrarResultado('<div class="spinner"></div>Calculando precio estimado...', 'loading');
+            
+            // Realizar petición
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                setTimeout(() => {
+                    if (data.error) {
+                        mostrarResultado(`Error: ${data.error}`, 'error');
+                    } else {
+                        const precio = parseFloat(data.precio_estimado).toFixed(2);
+                        mostrarResultado(`Precio estimado: $${precio}`, 'success');
+                    }
+                    resetButton();
+                }, 600);
+            })
+            .catch(error => {
+                setTimeout(() => {
+                    mostrarResultado('Error de conexión. Intenta nuevamente.', 'error');
+                    resetButton();
+                }, 600);
+                console.error('Error:', error);
+            });
+        }
+        
+        function mostrarResultado(mensaje, tipo) {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = mensaje;
+            resultado.className = `result ${tipo}`;
+            resultado.style.display = 'block';
+        }
+        
+        function resetButton() {
+            const submitBtn = document.querySelector('.btn-predict');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Predecir Precio';
+        }
+        
+        // Event listeners
+        document.getElementById('formulario').addEventListener('submit', predecirPrecio);
+        
+        // Limpiar resultado al cambiar inputs
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', function() {
+                const resultado = document.getElementById('resultado');
+                if (resultado.style.display !== 'none') {
+                    resultado.style.opacity = '0.6';
+                }
+            });
         });
     </script>
-  </body>
+</body>
 </html>
