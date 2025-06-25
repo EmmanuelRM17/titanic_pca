@@ -93,6 +93,45 @@
             background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
         }
 
+        .utility-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .utility-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .utility-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .utility-btn.random {
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
+        }
+
+        .utility-btn.help {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+        }
+
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -431,6 +470,98 @@
             animation: progress 2s ease-in-out infinite;
         }
 
+        /* Modal para ayuda */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .modal-body h3 {
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -458,6 +589,11 @@
                 max-width: 800px;
                 padding: 40px 32px;
             }
+            
+            .utility-buttons {
+                top: 16px;
+                right: 16px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -483,6 +619,17 @@
             .result-price {
                 font-size: 2rem;
             }
+
+            .utility-buttons {
+                top: 12px;
+                right: 12px;
+                gap: 8px;
+            }
+
+            .utility-btn {
+                width: 40px;
+                height: 40px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -502,6 +649,11 @@
             h1 {
                 font-size: 1.5rem;
             }
+
+            .modal-content {
+                padding: 24px;
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -510,6 +662,16 @@
     <div class="progress-bar" id="progress-bar"></div>
     
     <div class="container">
+        <!-- Botones de utilidad -->
+        <div class="utility-buttons">
+            <button class="utility-btn random" id="random-btn" title="Generar datos aleatorios">
+                <i class="fas fa-dice"></i>
+            </button>
+            <button class="utility-btn help" id="help-btn" title="Ayuda">
+                <i class="fas fa-question"></i>
+            </button>
+        </div>
+
         <div class="header">
             <div class="header-icon">
                 <i class="fas fa-gem"></i>
@@ -747,7 +909,7 @@
 
         <div id="resultado" class="result-card">
             <i class="result-icon fas fa-dollar-sign"></i>
-            <div class="result-price" id="price-display">$0.00</div>
+            <div class="result-price" id="price-display">0.00</div>
             <div class="result-model" id="model-display"></div>
         </div>
 
@@ -757,6 +919,51 @@
                 <span id="debug-toggle-text">Mostrar información técnica</span>
             </button>
             <div id="debug-info" class="debug-info"></div>
+        </div>
+    </div>
+
+    <!-- Modal de ayuda -->
+    <div class="modal-overlay" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Entendimiento del Problema</h2>
+                <button class="modal-close" onclick="closeHelpModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>Objetivo del Proyecto</h3>
+                <p>Este sistema utiliza machine learning para predecir el precio de zirconias cúbicas basándose en sus características físicas y cualitativas.</p>
+
+                <h3>Variables de Entrada</h3>
+                <ul>
+                    <li><strong>Carat:</strong> Peso de la piedra en quilates (0.1 - 5.0)</li>
+                    <li><strong>Cut:</strong> Calidad del corte (Fair, Good, Very Good, Premium, Ideal)</li>
+                    <li><strong>Color:</strong> Grado de color desde D (incoloro) hasta J (amarillento)</li>
+                    <li><strong>Clarity:</strong> Claridad desde I1 (inclusiones visibles) hasta IF (internamente perfecto)</li>
+                    <li><strong>Depth & Table:</strong> Proporciones geométricas en porcentaje</li>
+                    <li><strong>X, Y, Z:</strong> Dimensiones físicas en milímetros</li>
+                </ul>
+
+                <h3>Modelos Disponibles</h3>
+                <ul>
+                    <li><strong>Random Forest:</strong> Mejor precisión (R² = 97.74%)</li>
+                    <li><strong>Red Neuronal:</strong> Alternativa (R² = 95.72%)</li>
+                </ul>
+
+                <h3>Características del Dataset</h3>
+                <ul>
+                    <li>26,967 zirconias cúbicas sintéticas</li>
+                    <li>Rango de precios: 326 - 18,818 unidades</li>
+                    <li>El volumen se calcula automáticamente (X × Y × Z)</li>
+                </ul>
+
+                <h3>Uso del Sistema</h3>
+                <p>1. Complete todos los campos requeridos</p>
+                <p>2. Use el botón de dados para generar datos aleatorios de prueba</p>
+                <p>3. El sistema validará automáticamente los rangos</p>
+                <p>4. Obtendrá una predicción precisa del valor estimado</p>
+            </div>
         </div>
     </div>
 
@@ -770,6 +977,77 @@
             y: { min: 1, max: 15, message: 'La anchura debe estar entre 1 y 15 mm' },
             z: { min: 1, max: 10, message: 'La altura debe estar entre 1 y 10 mm' }
         };
+
+        // Datos aleatorios para generar ejemplos
+        const randomData = {
+            cuts: ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal'],
+            colors: ['D', 'E', 'F', 'G', 'H', 'I', 'J'],
+            clarities: ['I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF']
+        };
+
+        // Generar datos aleatorios realistas
+        function generateRandomData() {
+            const carat = (Math.random() * 4.8 + 0.2).toFixed(2);
+            const depth = (Math.random() * 20 + 50).toFixed(1);
+            const table = (Math.random() * 20 + 50).toFixed(1);
+            
+            // Dimensiones proporcionales al peso
+            const baseSize = Math.sqrt(parseFloat(carat)) * 3;
+            const x = (baseSize + Math.random() * 0.5).toFixed(2);
+            const y = (baseSize + Math.random() * 0.5).toFixed(2);
+            const z = (baseSize * 0.6 + Math.random() * 0.3).toFixed(2);
+            
+            const cut = randomData.cuts[Math.floor(Math.random() * randomData.cuts.length)];
+            const color = randomData.colors[Math.floor(Math.random() * randomData.colors.length)];
+            const clarity = randomData.clarities[Math.floor(Math.random() * randomData.clarities.length)];
+
+            return { carat, depth, table, x, y, z, cut, color, clarity };
+        }
+
+        // Llenar formulario con datos aleatorios
+        function fillRandomData() {
+            const data = generateRandomData();
+            
+            // Animar el llenado de campos
+            Object.entries(data).forEach((entry, index) => {
+                const [field, value] = entry;
+                setTimeout(() => {
+                    const element = document.getElementById(field);
+                    if (element) {
+                        element.value = value;
+                        element.style.transform = 'scale(1.05)';
+                        element.style.transition = 'transform 0.2s ease';
+                        
+                        // Validar el campo después de llenarlo
+                        if (element.type === 'number') {
+                            validateField(element);
+                        } else {
+                            validateSelect(element);
+                        }
+                        
+                        setTimeout(() => {
+                            element.style.transform = 'scale(1)';
+                        }, 200);
+                    }
+                }, index * 100);
+            });
+            
+            // Actualizar volumen después de llenar dimensiones
+            setTimeout(() => {
+                updateVolume();
+            }, 800);
+        }
+
+        // Modal de ayuda
+        function showHelpModal() {
+            document.getElementById('help-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
 
         // Calcular y mostrar volumen automáticamente
         function updateVolume() {
@@ -937,7 +1215,7 @@
                         const modeloUsado = data.modelo_usado || 'Modelo desconocido';
                         
                         showResult(
-                            `${precio}`,
+                            precio,
                             'success',
                             'fas fa-check-circle',
                             `Predicción realizada con ${modeloUsado}`
@@ -1010,11 +1288,11 @@
                 .then(response => response.json())
                 .then(data => {
                     const debugDiv = document.getElementById('debug-info');
-                    let html = '<strong>🔧 Información técnica del sistema:</strong><br><br>';
+                    let html = '<strong>Información técnica del sistema:</strong><br><br>';
                     
                     html += `<strong>Estado de modelos:</strong><br>`;
-                    html += `• Random Forest: ${data.modelos_cargados?.random_forest ? '✅ Cargado' : '❌ Error'}<br>`;
-                    html += `• Red Neuronal: ${data.modelos_cargados?.red_neuronal ? '✅ Cargado' : '❌ Error'}<br><br>`;
+                    html += `• Random Forest: ${data.modelos_cargados?.random_forest ? 'Cargado' : 'Error'}<br>`;
+                    html += `• Red Neuronal: ${data.modelos_cargados?.red_neuronal ? 'Cargado' : 'Error'}<br><br>`;
                     
                     if (data.caracteristicas_requeridas) {
                         html += `<strong>Características requeridas:</strong><br>`;
@@ -1025,7 +1303,7 @@
                     debugDiv.innerHTML = html;
                 })
                 .catch(error => {
-                    document.getElementById('debug-info').innerHTML = '❌ Error cargando información técnica. Verifica que el servidor esté ejecutándose.';
+                    document.getElementById('debug-info').innerHTML = 'Error cargando información técnica. Verifica que el servidor esté ejecutándose.';
                     console.error('Error cargando debug:', error);
                 });
         }
@@ -1047,6 +1325,26 @@
             // Event listeners
             document.getElementById('formulario').addEventListener('submit', predecirPrecio);
             
+            // Botón de datos aleatorios
+            document.getElementById('random-btn').addEventListener('click', fillRandomData);
+            
+            // Botón de ayuda
+            document.getElementById('help-btn').addEventListener('click', showHelpModal);
+            
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('help-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeHelpModal();
+                }
+            });
+            
+            // Cerrar modal con ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeHelpModal();
+                }
+            });
+            
             // Limpiar resultado al cambiar inputs
             document.querySelectorAll('.form-input:not([readonly]), .form-select').forEach(element => {
                 element.addEventListener('input', function() {
@@ -1057,8 +1355,8 @@
                 });
             });
             
-            console.log('🚀 Predictor de Precio de Circonia cargado');
-            console.log('📊 Características requeridas: volume, clarity_encoded, carat, color_encoded, depth, table');
+            console.log('Predictor de Precio de Circonia cargado');
+            console.log('Características requeridas: volume, clarity_encoded, carat, color_encoded, depth, table');
         });
     </script>
 </body>
