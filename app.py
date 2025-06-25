@@ -3,21 +3,12 @@ import joblib
 import pandas as pd
 import numpy as np
 import logging
+import os
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-# Cargar los modelos entrenados
-try:
-    modelo_rf = joblib.load('modelo_random_forest.pkl')
-    modelo_mlp = joblib.load('modelo_red_neuronal.pkl')
-    app.logger.debug("Modelos cargados correctamente.")
-except FileNotFoundError as e:
-    app.logger.error(f"Error cargando modelos: {e}")
-    modelo_rf = None
-    modelo_mlp = None
-
-# CARACTERÍSTICAS EXACTAS QUE ESPERAN LOS MODELOS (según debug)
+# CARACTERÍSTICAS EXACTAS QUE ESPERAN LOS MODELOS
 REQUIRED_FEATURES = ['volume', 'clarity_encoded', 'carat', 'color_encoded', 'depth', 'table']
 
 # Mapeos para variables categóricas
@@ -33,9 +24,27 @@ CLARITY_MAPPING = {
     'I1': 0, 'SI2': 1, 'SI1': 2, 'VS2': 3, 'VS1': 4, 'VVS2': 5, 'VVS1': 6, 'IF': 7
 }
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Variables globales para los modelos
+modelo_rf = None
+modelo_mlp = None
+
+def load_models():
+    """
+    Carga los modelos al iniciar la aplicación
+    """
+    global modelo_rf, modelo_mlp
+    
+    try:
+        modelo_rf = joblib.load('modelo_random_forest.pkl')
+        modelo_mlp = joblib.load('modelo_red_neuronal.pkl')
+        app.logger.info("✅ Modelos cargados correctamente")
+        return True
+    except FileNotFoundError as e:
+        app.logger.error(f"❌ Error cargando modelos: {e}")
+        return False
+    except Exception as e:
+        app.logger.error(f"❌ Error inesperado cargando modelos: {e}")
+        return False
 
 def preparar_datos_para_modelo(form_data):
     """
@@ -78,11 +87,21 @@ def preparar_datos_para_modelo(form_data):
     
     return pd.DataFrame([data_row], columns=REQUIRED_FEATURES)
 
+@app.route('/')
+def index():
+    """
+    Página principal de la aplicación
+    """
+    return render_template('index.html')
+
 @app.route('/predict', methods=['POST'])
 def predict():
+    """
+    Endpoint para realizar predicciones de precio
+    """
     # Verificar que los modelos estén cargados
     if modelo_rf is None or modelo_mlp is None:
-        return jsonify({'error': 'Modelos no disponibles'}), 500
+        return jsonify({'error': 'Modelos no disponibles. Contacta al administrador.'}), 500
     
     try:
         # Validar campos requeridos
@@ -149,7 +168,7 @@ def predict():
 @app.route('/debug')
 def debug_info():
     """
-    Endpoint para ver información de debug
+    Endpoint para información de debug
     """
     info = {
         'modelos_cargados': {
@@ -176,8 +195,23 @@ def debug_info():
     
     return jsonify(info)
 
+@app.route('/health')
+def health_check():
+    """
+    Endpoint de health check para el deployment
+    """
+    return jsonify({
+        'status': 'healthy',
+        'models_loaded': modelo_rf is not None and modelo_mlp is not None,
+        'timestamp': pd.Timestamp.now().isoformat()
+    })
+
+# Cargar modelos al iniciar la aplicación
+load_models()
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
 
 @app.route('/')
 def home():
@@ -234,7 +268,7 @@ def preparar_datos_para_modelo(form_data, features):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Verificar que los modelos estén cargados
+    # Verificar que los modelos estén cargadosss
     if modelo_rf is None or modelo_mlp is None:
         return jsonify({'error': 'Modelos no disponibles'}), 500
     
