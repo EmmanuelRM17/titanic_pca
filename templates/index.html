@@ -4,7 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predictor de Precio de Circonia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #8b5cf6;
+            --secondary-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #22c55e;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --bg-input: rgba(51, 65, 85, 0.6);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --border-color: rgba(148, 163, 184, 0.2);
+            --border-focus: var(--primary-color);
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,153 +48,392 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: radial-gradient(circle at 1px 1px, var(--text-primary) 1px, transparent 0);
+            background-size: 20px 20px;
+            pointer-events: none;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 500px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl), 0 0 60px rgba(99, 102, 241, 0.1);
+            padding: 48px 56px;
+            max-width: 1000px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-lg);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .header-icon i {
+            font-size: 28px;
+            color: white;
         }
 
         h1 {
-            text-align: center;
-            color: #2d3748;
-            margin-bottom: 32px;
-            font-size: 1.875rem;
+            font-size: 2.25rem;
             font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
             letter-spacing: -0.025em;
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 400;
         }
 
-        label {
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px 32px;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.span-2 {
+            grid-column: span 2;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #4a5568;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            transition: color 0.2s ease;
         }
 
-        input, select {
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input, .form-select {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            padding: 16px 20px;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
             font-size: 16px;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            color: #2d3748;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
 
-        input:focus, select:focus {
+        .form-input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
+            border-color: var(--border-focus);
+            background: rgba(51, 65, 85, 0.8);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
         }
 
-        select {
-            cursor: pointer;
+        .form-input:focus + .input-icon,
+        .form-select:focus + .input-icon {
+            color: var(--primary-color);
+        }
+
+        .form-input.valid {
+            border-color: var(--success-color);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .form-input.invalid {
+            border-color: var(--error-color);
+            background: rgba(239, 68, 68, 0.05);
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+            pointer-events: none;
+        }
+
+        .validation-message {
+            margin-top: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .validation-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .validation-message.error {
+            color: var(--error-color);
+        }
+
+        .validation-message.success {
+            color: var(--success-color);
         }
 
         .btn-predict {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 18px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-top: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-predict::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
         }
 
         .btn-predict:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl), 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-predict:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .btn-predict:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .btn-predict:disabled {
-            background: #cbd5e0;
+            background: var(--bg-tertiary);
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
-        .result {
-            margin-top: 24px;
-            padding: 20px;
-            border-radius: 12px;
+        .btn-predict .btn-text {
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-predict .btn-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-predict.loading .btn-text {
+            opacity: 0;
+        }
+
+        .btn-predict.loading .btn-loader {
+            opacity: 1;
+        }
+
+        .result-card {
+            margin-top: 32px;
+            padding: 24px;
+            border-radius: var(--radius-lg);
             text-align: center;
             font-weight: 600;
-            display: none;
-            animation: slideUp 0.4s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
         }
 
-        .result.success {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
+        .result-card.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .result.error {
-            background: linear-gradient(135deg, #f56565, #e53e3e);
-            color: white;
+        .result-card.success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+            border-color: rgba(34, 197, 94, 0.3);
+            color: var(--success-color);
         }
 
-        .result.loading {
-            background: #f7fafc;
-            color: #718096;
-            border: 2px solid #e2e8f0;
+        .result-card.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--error-color);
+        }
+
+        .result-card.loading {
+            background: rgba(51, 65, 85, 0.3);
+            color: var(--text-muted);
+        }
+
+        .result-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .result-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 16px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .result-model {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-top: 12px;
         }
 
         .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #e2e8f0;
-            border-top: 2px solid #667eea;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-top: 3px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 8px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+        .debug-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
         }
 
-        .full-width {
-            grid-column: 1 / -1;
+        .debug-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .debug-toggle:hover {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+        }
+
+        .debug-info {
+            margin-top: 16px;
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .debug-info.show {
+            max-height: 500px;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .progress-bar.loading {
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         @keyframes spin {
@@ -167,14 +441,62 @@
             100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 640px) {
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        @keyframes progress {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(0%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @media (max-width: 1024px) {
             .container {
-                padding: 24px;
+                max-width: 800px;
+                padding: 40px 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 32px 24px;
                 margin: 16px;
+                max-width: 600px;
             }
             
-            .grid {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px 24px;
+            }
+            
+            .form-group.span-2 {
+                grid-column: 1 / -1;
+            }
+            
+            h1 {
+                font-size: 1.875rem;
+            }
+            
+            .result-price {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 16px;
+            }
+            
+            .form-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .form-group.span-2 {
+                grid-column: 1;
             }
             
             h1 {
@@ -184,105 +506,418 @@
     </style>
 </head>
 <body>
+    <div class="background-pattern"></div>
+    <div class="progress-bar" id="progress-bar"></div>
+    
     <div class="container">
-        <h1>Predictor de Precio de Circonia</h1>
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-gem"></i>
+            </div>
+            <h1>Predictor de Precio</h1>
+            <p class="subtitle">Circonia Cúbica Premium</p>
+        </div>
+
         <form id="formulario">
-            <div class="grid">
+            <div class="form-grid">
+                <!-- Primera fila: Características principales -->
                 <div class="form-group">
-                    <label for="carat">Quilates</label>
-                    <input type="number" id="carat" step="0.01" min="0.1" max="5" placeholder="0.50" required>
+                    <label class="form-label" for="carat">
+                        <i class="fas fa-weight"></i> Quilates
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="number" 
+                            id="carat" 
+                            class="form-input" 
+                            step="0.01" 
+                            min="0.1" 
+                            max="5" 
+                            placeholder="0.50" 
+                            required
+                        >
+                        <i class="fas fa-balance-scale input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="carat-message"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="depth">Profundidad</label>
-                    <input type="number" id="depth" step="0.1" min="40" max="80" placeholder="61.5" required>
+                    <label class="form-label" for="depth">
+                        <i class="fas fa-arrows-alt-v"></i> Profundidad
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="number" 
+                            id="depth" 
+                            class="form-input" 
+                            step="0.1" 
+                            min="40" 
+                            max="80" 
+                            placeholder="61.5%" 
+                            required
+                        >
+                        <i class="fas fa-ruler-vertical input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="depth-message"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="table">Mesa</label>
-                    <input type="number" id="table" step="0.1" min="40" max="80" placeholder="55.0" required>
+                    <label class="form-label" for="table">
+                        <i class="fas fa-table"></i> Mesa
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="number" 
+                            id="table" 
+                            class="form-input" 
+                            step="0.1" 
+                            min="40" 
+                            max="80" 
+                            placeholder="55.0%" 
+                            required
+                        >
+                        <i class="fas fa-square input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="table-message"></div>
                 </div>
+
+                <!-- Segunda fila: Dimensiones físicas -->
                 <div class="form-group">
-                    <label for="x">Longitud (mm)</label>
-                    <input type="number" id="x" step="0.01" min="1" max="15" placeholder="4.05" required>
+                    <label class="form-label" for="x">
+                        <i class="fas fa-arrows-alt-h"></i> Longitud
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="number" 
+                            id="x" 
+                            class="form-input" 
+                            step="0.01" 
+                            min="1" 
+                            max="15" 
+                            placeholder="4.05 mm" 
+                            required
+                        >
+                        <i class="fas fa-ruler-horizontal input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="x-message"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="y">Anchura (mm)</label>
-                    <input type="number" id="y" step="0.01" min="1" max="15" placeholder="4.07" required>
+                    <label class="form-label" for="y">
+                        <i class="fas fa-expand-arrows-alt"></i> Anchura
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="number" 
+                            id="y" 
+                            class="form-input" 
+                            step="0.01" 
+                            min="1" 
+                            max="15" 
+                            placeholder="4.07 mm" 
+                            required
+                        >
+                        <i class="fas fa-arrows-alt input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="y-message"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="z">Altura (mm)</label>
-                    <input type="number" id="z" step="0.01" min="1" max="10" placeholder="2.31" required>
+                    <label class="form-label" for="z">
+                        <i class="fas fa-arrows-alt-v"></i> Altura
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="number" 
+                            id="z" 
+                            class="form-input" 
+                            step="0.01" 
+                            min="1" 
+                            max="10" 
+                            placeholder="2.31 mm" 
+                            required
+                        >
+                        <i class="fas fa-ruler input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="z-message"></div>
                 </div>
+
+                <!-- Tercera fila: Características de calidad -->
                 <div class="form-group">
-                    <label for="cut">Tipo de Corte</label>
-                    <select id="cut" required>
-                        <option value="">Seleccionar corte</option>
-                        <option value="Fair">Fair</option>
-                        <option value="Good">Good</option>
-                        <option value="Very Good">Very Good</option>
-                        <option value="Premium">Premium</option>
-                        <option value="Ideal">Ideal</option>
-                    </select>
+                    <label class="form-label" for="cut">
+                        <i class="fas fa-cut"></i> Tipo de Corte
+                    </label>
+                    <div class="input-wrapper">
+                        <select id="cut" class="form-select" required>
+                            <option value="">Seleccionar corte</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Good">Good</option>
+                            <option value="Very Good">Very Good</option>
+                            <option value="Premium">Premium</option>
+                            <option value="Ideal">Ideal</option>
+                        </select>
+                        <i class="fas fa-chevron-down input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="cut-message"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="color">Color</label>
-                    <select id="color" required>
-                        <option value="">Seleccionar color</option>
-                        <option value="D">D (Incoloro)</option>
-                        <option value="E">E (Incoloro)</option>
-                        <option value="F">F (Incoloro)</option>
-                        <option value="G">G (Casi incoloro)</option>
-                        <option value="H">H (Casi incoloro)</option>
-                        <option value="I">I (Casi incoloro)</option>
-                        <option value="J">J (Casi incoloro)</option>
-                    </select>
+                    <label class="form-label" for="color">
+                        <i class="fas fa-palette"></i> Color
+                    </label>
+                    <div class="input-wrapper">
+                        <select id="color" class="form-select" required>
+                            <option value="">Seleccionar color</option>
+                            <option value="D">D (Incoloro)</option>
+                            <option value="E">E (Incoloro)</option>
+                            <option value="F">F (Incoloro)</option>
+                            <option value="G">G (Casi incoloro)</option>
+                            <option value="H">H (Casi incoloro)</option>
+                            <option value="I">I (Casi incoloro)</option>
+                            <option value="J">J (Casi incoloro)</option>
+                        </select>
+                        <i class="fas fa-chevron-down input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="color-message"></div>
                 </div>
+
                 <div class="form-group">
-                    <label for="clarity">Claridad</label>
-                    <select id="clarity" required>
-                        <option value="">Seleccionar claridad</option>
-                        <option value="I1">I1 (Imperfecciones visibles)</option>
-                        <option value="SI2">SI2 (Pequeñas imperfecciones)</option>
-                        <option value="SI1">SI1 (Pequeñas imperfecciones)</option>
-                        <option value="VS2">VS2 (Muy pequeñas imperfecciones)</option>
-                        <option value="VS1">VS1 (Muy pequeñas imperfecciones)</option>
-                        <option value="VVS2">VVS2 (Imperfecciones muy, muy pequeñas)</option>
-                        <option value="VVS1">VVS1 (Imperfecciones muy, muy pequeñas)</option>
-                        <option value="IF">IF (Internamente perfecto)</option>
-                    </select>
+                    <label class="form-label" for="clarity">
+                        <i class="fas fa-eye"></i> Claridad
+                    </label>
+                    <div class="input-wrapper">
+                        <select id="clarity" class="form-select" required>
+                            <option value="">Seleccionar claridad</option>
+                            <option value="I1">I1 (Imperfecciones visibles)</option>
+                            <option value="SI2">SI2 (Pequeñas imperfecciones)</option>
+                            <option value="SI1">SI1 (Pequeñas imperfecciones)</option>
+                            <option value="VS2">VS2 (Muy pequeñas imperfecciones)</option>
+                            <option value="VS1">VS1 (Muy pequeñas imperfecciones)</option>
+                            <option value="VVS2">VVS2 (Imperfecciones muy, muy pequeñas)</option>
+                            <option value="VVS1">VVS1 (Imperfecciones muy, muy pequeñas)</option>
+                            <option value="IF">IF (Internamente perfecto)</option>
+                        </select>
+                        <i class="fas fa-chevron-down input-icon"></i>
+                    </div>
+                    <div class="validation-message" id="clarity-message"></div>
                 </div>
+
+                <!-- Cuarta fila: Modelo de predicción y información adicional -->
                 <div class="form-group">
-                    <label for="modelo">Modelo de predicción</label>
-                    <select id="modelo">
-                        <option value="rf">Random Forest</option>
-                        <option value="mlp">Red Neuronal</option>
-                    </select>
+                    <label class="form-label" for="modelo">
+                        <i class="fas fa-brain"></i> Modelo de Predicción
+                    </label>
+                    <div class="input-wrapper">
+                        <select id="modelo" class="form-select">
+                            <option value="rf">Random Forest</option>
+                            <option value="mlp">Red Neuronal</option>
+                        </select>
+                        <i class="fas fa-chevron-down input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-cube"></i> Volumen Calculado
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="volume-display" 
+                            class="form-input" 
+                            placeholder="Se calcula automáticamente" 
+                            readonly
+                            style="background: rgba(51, 65, 85, 0.3); cursor: not-allowed;"
+                        >
+                        <i class="fas fa-calculator input-icon"></i>
+                    </div>
+                    <div class="validation-message success show">Calculado automáticamente: X × Y × Z</div>
                 </div>
             </div>
-            <button type="submit" class="btn-predict">Predecir Precio</button>
+
+            <button type="submit" class="btn-predict" id="predict-btn">
+                <span class="btn-text">
+                    <i class="fas fa-calculator"></i> Predecir Precio
+                </span>
+                <div class="btn-loader">
+                    <div class="spinner"></div>
+                </div>
+            </button>
         </form>
-        <div id="resultado" class="result"></div>
+
+        <div id="resultado" class="result-card">
+            <i class="result-icon fas fa-dollar-sign"></i>
+            <div class="result-price" id="price-display">$0.00</div>
+            <div class="result-model" id="model-display"></div>
+        </div>
+
+        <div class="debug-section">
+            <button type="button" class="debug-toggle" onclick="toggleDebug()">
+                <i class="fas fa-cog"></i>
+                <span id="debug-toggle-text">Mostrar información técnica</span>
+            </button>
+            <div id="debug-info" class="debug-info"></div>
+        </div>
     </div>
 
     <script>
-        // Manejar la predicción del precio
+        // Configuración de validaciones
+        const validationRules = {
+            carat: { min: 0.1, max: 5.0, message: 'Los quilates deben estar entre 0.1 y 5.0' },
+            depth: { min: 40, max: 80, message: 'La profundidad debe estar entre 40 y 80%' },
+            table: { min: 40, max: 80, message: 'La mesa debe estar entre 40 y 80%' },
+            x: { min: 1, max: 15, message: 'La longitud debe estar entre 1 y 15 mm' },
+            y: { min: 1, max: 15, message: 'La anchura debe estar entre 1 y 15 mm' },
+            z: { min: 1, max: 10, message: 'La altura debe estar entre 1 y 10 mm' }
+        };
+
+        // Calcular y mostrar volumen automáticamente
+        function updateVolume() {
+            const x = parseFloat(document.getElementById('x').value) || 0;
+            const y = parseFloat(document.getElementById('y').value) || 0;
+            const z = parseFloat(document.getElementById('z').value) || 0;
+            
+            if (x > 0 && y > 0 && z > 0) {
+                const volume = (x * y * z).toFixed(3);
+                document.getElementById('volume-display').value = `${volume} mm³`;
+            } else {
+                document.getElementById('volume-display').value = '';
+            }
+        }
+
+        // Validación en tiempo real
+        function setupRealTimeValidation() {
+            const inputs = document.querySelectorAll('.form-input:not([readonly])');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validateField(this);
+                    
+                    // Actualizar volumen si es una dimensión
+                    if (['x', 'y', 'z'].includes(this.id)) {
+                        updateVolume();
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+            });
+
+            const selects = document.querySelectorAll('.form-select');
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    validateSelect(this);
+                });
+            });
+        }
+
+        function validateField(field) {
+            const value = parseFloat(field.value);
+            const fieldName = field.id;
+            const rule = validationRules[fieldName];
+            const messageElement = document.getElementById(`${fieldName}-message`);
+
+            if (!field.value.trim()) {
+                showValidationMessage(messageElement, 'Este campo es requerido', 'error');
+                field.classList.remove('valid');
+                field.classList.add('invalid');
+                return false;
+            }
+
+            if (rule && (isNaN(value) || value < rule.min || value > rule.max)) {
+                showValidationMessage(messageElement, rule.message, 'error');
+                field.classList.remove('valid');
+                field.classList.add('invalid');
+                return false;
+            }
+
+            showValidationMessage(messageElement, 'Válido', 'success');
+            field.classList.remove('invalid');
+            field.classList.add('valid');
+            return true;
+        }
+
+        function validateSelect(select) {
+            const messageElement = document.getElementById(`${select.id}-message`);
+            
+            if (!select.value) {
+                showValidationMessage(messageElement, 'Por favor selecciona una opción', 'error');
+                select.classList.remove('valid');
+                select.classList.add('invalid');
+                return false;
+            }
+
+            showValidationMessage(messageElement, 'Válido', 'success');
+            select.classList.remove('invalid');
+            select.classList.add('valid');
+            return true;
+        }
+
+        function showValidationMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `validation-message show ${type}`;
+        }
+
+        function validateAllFields() {
+            const inputs = document.querySelectorAll('.form-input:not([readonly])');
+            const selects = document.querySelectorAll('.form-select[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!validateField(input)) {
+                    isValid = false;
+                }
+            });
+
+            selects.forEach(select => {
+                if (!validateSelect(select)) {
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        function showProgressBar() {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = '100%';
+            progressBar.classList.add('loading');
+        }
+
+        function hideProgressBar() {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.classList.remove('loading');
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+            }, 300);
+        }
+
         function predecirPrecio(event) {
             event.preventDefault();
             
+            // Validar todos los campos
+            if (!validateAllFields()) {
+                showResult('Por favor corrige los errores antes de continuar', 'error', 'fas fa-exclamation-triangle');
+                return;
+            }
+
             const form = document.getElementById('formulario');
-            const resultado = document.getElementById('resultado');
-            const submitBtn = form.querySelector('.btn-predict');
+            const predictBtn = document.getElementById('predict-btn');
             
             // Preparar datos del formulario
             const formData = new FormData();
-            const inputs = form.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                formData.append(input.name || input.id, input.value);
+            const requiredFields = ['carat', 'depth', 'table', 'x', 'y', 'z', 'cut', 'color', 'clarity'];
+            
+            requiredFields.forEach(field => {
+                formData.append(field, document.getElementById(field).value);
             });
+            formData.append('modelo', document.getElementById('modelo').value);
             
             // Estado de carga
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Procesando...';
-            mostrarResultado('<div class="spinner"></div>Calculando precio estimado...', 'loading');
+            predictBtn.disabled = true;
+            predictBtn.classList.add('loading');
+            showProgressBar();
+            showResult('Analizando características de la circonia...', 'loading', 'fas fa-search');
             
             // Realizar petición
             fetch('/predict', {
@@ -292,48 +927,138 @@
             .then(response => response.json())
             .then(data => {
                 setTimeout(() => {
+                    hideProgressBar();
+                    
                     if (data.error) {
-                        mostrarResultado(`Error: ${data.error}`, 'error');
+                        showResult(data.error, 'error', 'fas fa-exclamation-circle');
+                        console.error('Error del servidor:', data.error);
                     } else {
                         const precio = parseFloat(data.precio_estimado).toFixed(2);
-                        mostrarResultado(`Precio estimado: $${precio}`, 'success');
+                        const modeloUsado = data.modelo_usado || 'Modelo desconocido';
+                        
+                        showResult(
+                            `${precio}`,
+                            'success',
+                            'fas fa-check-circle',
+                            `Predicción realizada con ${modeloUsado}`
+                        );
+                        
+                        // Actualizar información de debug si está visible
+                        updateDebugInfo(data);
                     }
-                    resetButton();
-                }, 600);
+                    
+                    predictBtn.disabled = false;
+                    predictBtn.classList.remove('loading');
+                }, 1000);
             })
             .catch(error => {
                 setTimeout(() => {
-                    mostrarResultado('Error de conexión. Intenta nuevamente.', 'error');
-                    resetButton();
-                }, 600);
-                console.error('Error:', error);
+                    hideProgressBar();
+                    showResult(
+                        'Error de conexión. Verifica que el servidor Flask esté ejecutándose en el puerto 5000.',
+                        'error',
+                        'fas fa-wifi'
+                    );
+                    predictBtn.disabled = false;
+                    predictBtn.classList.remove('loading');
+                }, 1000);
+                console.error('Error de conexión:', error);
             });
         }
-        
-        function mostrarResultado(mensaje, tipo) {
-            const resultado = document.getElementById('resultado');
-            resultado.innerHTML = mensaje;
-            resultado.className = `result ${tipo}`;
-            resultado.style.display = 'block';
+
+        function showResult(message, type, icon, subtitle = '') {
+            const resultCard = document.getElementById('resultado');
+            const resultIcon = resultCard.querySelector('.result-icon');
+            const priceDisplay = document.getElementById('price-display');
+            const modelDisplay = document.getElementById('model-display');
+            
+            resultIcon.className = `result-icon ${icon}`;
+            
+            if (type === 'success') {
+                priceDisplay.textContent = message;
+                modelDisplay.textContent = subtitle;
+            } else {
+                priceDisplay.textContent = message;
+                priceDisplay.style.fontSize = '1.5rem';
+                modelDisplay.textContent = subtitle;
+            }
+            
+            resultCard.className = `result-card ${type} show`;
+            
+            // Reset font size for success
+            if (type === 'success') {
+                priceDisplay.style.fontSize = '2.5rem';
+            }
         }
-        
-        function resetButton() {
-            const submitBtn = document.querySelector('.btn-predict');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Predecir Precio';
+
+        function toggleDebug() {
+            const debugInfo = document.getElementById('debug-info');
+            const toggleText = document.getElementById('debug-toggle-text');
+            
+            if (debugInfo.classList.contains('show')) {
+                debugInfo.classList.remove('show');
+                toggleText.textContent = 'Mostrar información técnica';
+            } else {
+                loadDebugInfo();
+                debugInfo.classList.add('show');
+                toggleText.textContent = 'Ocultar información técnica';
+            }
         }
-        
-        // Event listeners
-        document.getElementById('formulario').addEventListener('submit', predecirPrecio);
-        
-        // Limpiar resultado al cambiar inputs
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('input', function() {
-                const resultado = document.getElementById('resultado');
-                if (resultado.style.display !== 'none') {
-                    resultado.style.opacity = '0.6';
+
+        function loadDebugInfo() {
+            fetch('/debug')
+                .then(response => response.json())
+                .then(data => {
+                    const debugDiv = document.getElementById('debug-info');
+                    let html = '<strong>🔧 Información técnica del sistema:</strong><br><br>';
+                    
+                    html += `<strong>Estado de modelos:</strong><br>`;
+                    html += `• Random Forest: ${data.modelos_cargados?.random_forest ? '✅ Cargado' : '❌ Error'}<br>`;
+                    html += `• Red Neuronal: ${data.modelos_cargados?.red_neuronal ? '✅ Cargado' : '❌ Error'}<br><br>`;
+                    
+                    if (data.caracteristicas_requeridas) {
+                        html += `<strong>Características requeridas:</strong><br>`;
+                        html += `${data.caracteristicas_requeridas.join(', ')}<br><br>`;
+                        html += `<strong>Orden exacto:</strong><br>${data.orden_caracteristicas}<br>`;
+                    }
+                    
+                    debugDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    document.getElementById('debug-info').innerHTML = '❌ Error cargando información técnica. Verifica que el servidor esté ejecutándose.';
+                    console.error('Error cargando debug:', error);
+                });
+        }
+
+        function updateDebugInfo(predictionData) {
+            if (predictionData.caracteristicas_usadas) {
+                const debugDiv = document.getElementById('debug-info');
+                if (debugDiv.classList.contains('show')) {
+                    const currentContent = debugDiv.innerHTML;
+                    debugDiv.innerHTML = currentContent + `<br><br><strong>Última predicción:</strong><br>Características usadas: ${predictionData.caracteristicas_usadas.join(', ')}`;
                 }
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            setupRealTimeValidation();
+            
+            // Event listeners
+            document.getElementById('formulario').addEventListener('submit', predecirPrecio);
+            
+            // Limpiar resultado al cambiar inputs
+            document.querySelectorAll('.form-input:not([readonly]), .form-select').forEach(element => {
+                element.addEventListener('input', function() {
+                    const resultCard = document.getElementById('resultado');
+                    if (resultCard.classList.contains('show')) {
+                        resultCard.style.opacity = '0.6';
+                    }
+                });
             });
+            
+            console.log('🚀 Predictor de Precio de Circonia cargado');
+            console.log('📊 Características requeridas: volume, clarity_encoded, carat, color_encoded, depth, table');
         });
     </script>
 </body>
