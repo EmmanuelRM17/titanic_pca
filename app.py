@@ -6,7 +6,7 @@ import logging
 import os
 
 app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # CARACTERÍSTICAS EXACTAS QUE ESPERAN LOS MODELOS
 REQUIRED_FEATURES = ['volume', 'clarity_encoded', 'carat', 'color_encoded', 'depth', 'table']
@@ -149,7 +149,7 @@ def predict():
         
         precio_estimado = float(prediction[0])
         
-        app.logger.debug(f"Predicción exitosa: ${precio_estimado:.2f} usando {modelo_nombre}")
+        app.logger.info(f"Predicción exitosa: ${precio_estimado:.2f} usando {modelo_nombre}")
         
         return jsonify({
             'precio_estimado': precio_estimado,
@@ -212,171 +212,3 @@ load_models()
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-def preparar_datos_para_modelo(form_data, features):
-    """
-    Prepara los datos según las características que espera el modelo
-    """
-    # Extraer datos del formulario
-    carat = float(form_data['carat'])
-    depth = float(form_data['depth'])
-    table = float(form_data['table'])
-    x = float(form_data['x'])
-    y = float(form_data['y'])
-    z = float(form_data['z'])
-    cut = form_data['cut']
-    color = form_data['color']
-    clarity = form_data['clarity']
-    
-    # Preparar datos según las características requeridas
-    data_row = []
-    for feature in features:
-        if feature == 'carat':
-            data_row.append(carat)
-        elif feature == 'depth':
-            data_row.append(depth)
-        elif feature == 'table':
-            data_row.append(table)
-        elif feature == 'x':
-            data_row.append(x)
-        elif feature == 'y':
-            data_row.append(y)
-        elif feature == 'z':
-            data_row.append(z)
-        elif feature == 'cut':
-            data_row.append(cut)
-        elif feature == 'color':
-            data_row.append(color)
-        elif feature == 'clarity':
-            data_row.append(clarity)
-        elif feature == 'cut_encoded':
-            data_row.append(CUT_MAPPING[cut])
-        elif feature == 'color_encoded':
-            data_row.append(COLOR_MAPPING[color])
-        elif feature == 'clarity_encoded':
-            data_row.append(CLARITY_MAPPING[clarity])
-        elif feature == 'volume':
-            data_row.append(x * y * z)
-        else:
-            raise ValueError(f"Característica desconocida: {feature}")
-    
-    return pd.DataFrame([data_row], columns=features)
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    # Verificar que los modelos estén cargadosss
-    if modelo_rf is None or modelo_mlp is None:
-        return jsonify({'error': 'Modelos no disponibles'}), 500
-    
-    # Verificar que se hayan detectado las características
-    if WORKING_FEATURES_RF is None or WORKING_FEATURES_MLP is None:
-        return jsonify({'error': 'No se pudieron detectar las características del modelo'}), 500
-    
-    try:
-        # Validar datos de entrada
-        required_fields = ['carat', 'depth', 'table', 'x', 'y', 'z', 'cut', 'color', 'clarity']
-        for field in required_fields:
-            if field not in request.form or not request.form[field]:
-                return jsonify({'error': f'Campo requerido: {field}'}), 400
-        
-        # Validar rangos básicos
-        carat = float(request.form['carat'])
-        if not (0.1 <= carat <= 5.0):
-            return jsonify({'error': 'Quilates debe estar entre 0.1 y 5.0'}), 400
-        
-        depth = float(request.form['depth'])
-        if not (40 <= depth <= 80):
-            return jsonify({'error': 'Profundidad debe estar entre 40 y 80'}), 400
-        
-        table = float(request.form['table'])
-        if not (40 <= table <= 80):
-            return jsonify({'error': 'Mesa debe estar entre 40 y 80'}), 400
-        
-        # Validar categorías
-        cut = request.form['cut']
-        if cut not in CUT_MAPPING:
-            return jsonify({'error': f'Tipo de corte no válido: {cut}'}), 400
-        
-        color = request.form['color']
-        if color not in COLOR_MAPPING:
-            return jsonify({'error': f'Color no válido: {color}'}), 400
-        
-        clarity = request.form['clarity']
-        if clarity not in CLARITY_MAPPING:
-            return jsonify({'error': f'Claridad no válida: {clarity}'}), 400
-        
-        modelo_usado = request.form.get('modelo', 'rf')
-        
-        # Preparar datos según el modelo seleccionado
-        if modelo_usado == 'mlp':
-            if WORKING_FEATURES_MLP is None:
-                return jsonify({'error': 'Red Neuronal no disponible'}), 500
-            data_df = preparar_datos_para_modelo(request.form, WORKING_FEATURES_MLP)
-            prediction = modelo_mlp.predict(data_df)
-            modelo_nombre = 'Red Neuronal'
-            caracteristicas_usadas = WORKING_FEATURES_MLP
-        else:
-            if WORKING_FEATURES_RF is None:
-                return jsonify({'error': 'Random Forest no disponible'}), 500
-            data_df = preparar_datos_para_modelo(request.form, WORKING_FEATURES_RF)
-            prediction = modelo_rf.predict(data_df)
-            modelo_nombre = 'Random Forest'
-            caracteristicas_usadas = WORKING_FEATURES_RF
-        
-        precio_estimado = float(prediction[0])
-        
-        app.logger.debug(f"Predicción exitosa: ${precio_estimado:.2f} usando {modelo_nombre}")
-        app.logger.debug(f"Características usadas: {caracteristicas_usadas}")
-        app.logger.debug(f"Datos enviados: {data_df.iloc[0].to_dict()}")
-        
-        return jsonify({
-            'precio_estimado': precio_estimado,
-            'modelo_usado': modelo_nombre,
-            'caracteristicas_usadas': caracteristicas_usadas
-        })
-        
-    except ValueError as e:
-        app.logger.error(f"Error de validación: {str(e)}")
-        return jsonify({'error': f'Datos inválidos: {str(e)}'}), 400
-    except Exception as e:
-        app.logger.error(f"Error en predicción: {str(e)}")
-        return jsonify({'error': f'Error interno: {str(e)}'}), 500
-
-@app.route('/debug')
-def debug_info():
-    """
-    Endpoint para ver información de debug
-    """
-    info = {
-        'modelos_cargados': {
-            'random_forest': modelo_rf is not None,
-            'red_neuronal': modelo_mlp is not None
-        },
-        'caracteristicas_detectadas': {
-            'random_forest': WORKING_FEATURES_RF,
-            'red_neuronal': WORKING_FEATURES_MLP
-        }
-    }
-    
-    if modelo_rf:
-        info['random_forest_info'] = {
-            'tipo': str(type(modelo_rf)),
-            'n_features': getattr(modelo_rf, 'n_features_in_', 'No disponible'),
-            'feature_names': getattr(modelo_rf, 'feature_names_in_', 'No disponible')
-        }
-    
-    if modelo_mlp:
-        info['red_neuronal_info'] = {
-            'tipo': str(type(modelo_mlp)),
-            'n_features': getattr(modelo_mlp, 'n_features_in_', 'No disponible'),
-            'feature_names': getattr(modelo_mlp, 'feature_names_in_', 'No disponible')
-        }
-    
-    return jsonify(info)
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
