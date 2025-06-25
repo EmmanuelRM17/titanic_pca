@@ -15,5 +15,3 @@ __pycache__/
 .venv
 "@ | Out-File -FilePath ".gitignore" -Encoding UTF8
 
-# Archivos de modelos
-*.pkl
