@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 import joblib
 import numpy as np
 import logging
+import os
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -150,7 +151,8 @@ def debug():
     return jsonify({
         'modelo_cargado': modelo_titanic is not None,
         'tipo_modelo': str(type(modelo_titanic)) if modelo_titanic else None,
-        'status': 'OK' if modelo_titanic else 'ERROR'
+        'status': 'OK' if modelo_titanic else 'ERROR',
+        'archivo_existe': os.path.exists('modelo_titanic.pkl')
     })
 
 @app.route('/test')
@@ -186,6 +188,10 @@ def test():
     except Exception as e:
         return jsonify({'error': f'Error en test: {e}'})
 
+# 🔥 CLAVE: Cargar modelo al importar (para gunicorn)
+load_model()
+
+# Para desarrollo local y compatibilidad con gunicorn
 if __name__ == '__main__':
-    load_model()
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
