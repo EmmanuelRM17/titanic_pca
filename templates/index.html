@@ -3,1361 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predictor de Precio de Circonia</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>Predictor Titanic</title>
     <style>
-        :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #8b5cf6;
-            --secondary-color: #10b981;
-            --error-color: #ef4444;
-            --warning-color: #f59e0b;
-            --success-color: #22c55e;
-            
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --bg-card: rgba(30, 41, 59, 0.8);
-            --bg-input: rgba(51, 65, 85, 0.6);
-            
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            
-            --border-color: rgba(148, 163, 184, 0.2);
-            --border-focus: var(--primary-color);
-            
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            
-            --radius-sm: 6px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a8a 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            color: var(--text-primary);
-            overflow-x: hidden;
         }
-
-        .background-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.03;
-            background-image: radial-gradient(circle at 1px 1px, var(--text-primary) 1px, transparent 0);
-            background-size: 20px 20px;
-            pointer-events: none;
-        }
-
+        
         .container {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-xl), 0 0 60px rgba(99, 102, 241, 0.1);
-            padding: 48px 56px;
-            max-width: 1000px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-        }
-
-        .utility-buttons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 12px;
-            z-index: 10;
-        }
-
-        .utility-btn {
-            width: 44px;
-            height: 44px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-
-        .utility-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .utility-btn.random {
-            background: linear-gradient(135deg, var(--secondary-color), #059669);
-        }
-
-        .utility-btn.help {
-            background: linear-gradient(135deg, var(--warning-color), #d97706);
-        }
-
+        
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            position: relative;
+            margin-bottom: 35px;
         }
-
-        .header-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: var(--shadow-lg);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .header-icon i {
-            font-size: 28px;
-            color: white;
-        }
-
+        
         h1 {
-            font-size: 2.25rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: -0.025em;
         }
-
+        
         .subtitle {
-            color: var(--text-muted);
+            color: #7f8c8d;
             font-size: 1rem;
-            font-weight: 400;
+            margin-bottom: 25px;
         }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px 32px;
-            margin-bottom: 40px;
-        }
-
+        
         .form-group {
-            position: relative;
+            margin-bottom: 25px;
         }
-
-        .form-group.span-2 {
-            grid-column: span 2;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-label {
+        
+        label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: color 0.2s ease;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 0.95rem;
         }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .form-input, .form-select {
+        
+        input, select {
             width: 100%;
-            padding: 16px 20px;
-            background: var(--bg-input);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
+            padding: 15px 18px;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
             font-size: 16px;
-            color: var(--text-primary);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
+            background: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
         }
-
-        .form-input::placeholder {
-            color: var(--text-muted);
-            opacity: 0.7;
-        }
-
-        .form-input:focus, .form-select:focus {
+        
+        input:focus, select:focus {
+            border-color: #2c5aa0;
             outline: none;
-            border-color: var(--border-focus);
-            background: rgba(51, 65, 85, 0.8);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
             transform: translateY(-2px);
         }
-
-        .form-input:focus + .input-icon,
-        .form-select:focus + .input-icon {
-            color: var(--primary-color);
+        
+        input:hover, select:hover {
+            border-color: #bdc3c7;
         }
-
-        .form-input.valid {
-            border-color: var(--success-color);
-            background: rgba(34, 197, 94, 0.05);
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
-
-        .form-input.invalid {
-            border-color: var(--error-color);
-            background: rgba(239, 68, 68, 0.05);
-            animation: shake 0.3s ease-in-out;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            transition: color 0.2s ease;
-            pointer-events: none;
-        }
-
-        .validation-message {
-            margin-top: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-        }
-
-        .validation-message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .validation-message.error {
-            color: var(--error-color);
-        }
-
-        .validation-message.success {
-            color: var(--success-color);
-        }
-
-        .btn-predict {
-            width: 100%;
-            padding: 18px 24px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        
+        .random-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 15px;
+            padding: 12px 24px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
         }
-
-        .btn-predict::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
+        
+        .random-btn:hover {
+            background: linear-gradient(135deg, #219a52, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
         }
-
-        .btn-predict:hover:not(:disabled) {
+        
+        .predict-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, #2c5aa0, #1e3a8a);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(44, 90, 160, 0.3);
+        }
+        
+        .predict-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
             transform: translateY(-3px);
-            box-shadow: var(--shadow-xl), 0 0 30px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 25px rgba(44, 90, 160, 0.4);
         }
-
-        .btn-predict:hover:not(:disabled)::before {
-            left: 100%;
-        }
-
-        .btn-predict:active:not(:disabled) {
-            transform: translateY(-1px);
-        }
-
-        .btn-predict:disabled {
-            background: var(--bg-tertiary);
+        
+        .predict-btn:disabled {
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6);
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
+            box-shadow: 0 4px 15px rgba(189, 195, 199, 0.3);
         }
-
-        .btn-predict .btn-text {
-            transition: opacity 0.2s ease;
-        }
-
-        .btn-predict .btn-loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .btn-predict.loading .btn-text {
-            opacity: 0;
-        }
-
-        .btn-predict.loading .btn-loader {
-            opacity: 1;
-        }
-
-        .result-card {
-            margin-top: 32px;
-            padding: 24px;
-            border-radius: var(--radius-lg);
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 20px;
             text-align: center;
+            font-size: 18px;
             font-weight: 600;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-        }
-
-        .result-card.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .result-card.success {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
-            border-color: rgba(34, 197, 94, 0.3);
-            color: var(--success-color);
-        }
-
-        .result-card.error {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-            border-color: rgba(239, 68, 68, 0.3);
-            color: var(--error-color);
-        }
-
-        .result-card.loading {
-            background: rgba(51, 65, 85, 0.3);
-            color: var(--text-muted);
-        }
-
-        .result-icon {
-            font-size: 2rem;
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .result-price {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 16px 0;
-            letter-spacing: -0.02em;
-        }
-
-        .result-model {
-            font-size: 0.875rem;
-            opacity: 0.8;
-            margin-top: 12px;
-        }
-
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(99, 102, 241, 0.3);
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .debug-section {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .debug-toggle {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .debug-toggle:hover {
-            background: var(--bg-input);
-            color: var(--text-secondary);
-        }
-
-        .debug-info {
-            margin-top: 16px;
-            padding: 20px;
-            background: var(--bg-input);
-            border-radius: var(--radius-md);
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            max-height: 0;
-            overflow: hidden;
+            display: none;
             transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
-
-        .debug-info.show {
-            max-height: 500px;
+        
+        .result.success {
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(46, 204, 113, 0.1));
+            color: #27ae60;
+            border-color: rgba(39, 174, 96, 0.3);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.1);
         }
-
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
+        
+        .result.danger {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+            color: #e74c3c;
+            border-color: rgba(231, 76, 60, 0.3);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1);
         }
-
-        .progress-bar.loading {
-            animation: progress 2s ease-in-out infinite;
+        
+        .result.error {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.1), rgba(230, 126, 34, 0.1));
+            color: #f39c12;
+            border-color: rgba(241, 196, 15, 0.3);
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.1);
         }
-
-        /* Modal para ayuda */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        
+        .result.loading {
+            background: linear-gradient(135deg, rgba(52, 73, 94, 0.1), rgba(44, 62, 80, 0.1));
+            color: #34495e;
+            border-color: rgba(52, 73, 94, 0.3);
         }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
         }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 32px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
         }
-
-        .modal-overlay.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--bg-input);
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .modal-body h3 {
-            color: var(--text-primary);
-            margin-bottom: 12px;
-            margin-top: 20px;
-        }
-
-        .modal-body ul {
-            margin-left: 20px;
-            margin-bottom: 16px;
-        }
-
-        .modal-body li {
-            margin-bottom: 8px;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
-        }
-
-        @keyframes progress {
-            0% { transform: translateX(-100%); }
-            50% { transform: translateX(0%); }
-            100% { transform: translateX(100%); }
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                max-width: 800px;
-                padding: 40px 32px;
-            }
-            
-            .utility-buttons {
-                top: 16px;
-                right: 16px;
-            }
-        }
-
+        
         @media (max-width: 768px) {
             .container {
-                padding: 32px 24px;
-                margin: 16px;
-                max-width: 600px;
+                padding: 30px 25px;
+                border-radius: 15px;
             }
             
-            .form-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px 24px;
-            }
-            
-            .form-group.span-2 {
-                grid-column: 1 / -1;
+            .grid, .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
             
             h1 {
-                font-size: 1.875rem;
+                font-size: 1.8rem;
             }
             
-            .result-price {
-                font-size: 2rem;
+            .btn-container {
+                flex-direction: column;
             }
-
-            .utility-buttons {
-                top: 12px;
-                right: 12px;
-                gap: 8px;
-            }
-
-            .utility-btn {
-                width: 40px;
-                height: 40px;
+            
+            .random-btn {
+                width: 100%;
             }
         }
-
+        
         @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
             .container {
-                padding: 24px 16px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            
-            .form-group.span-2 {
-                grid-column: 1;
+                padding: 25px 20px;
             }
             
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
             }
-
-            .modal-content {
-                padding: 24px;
-                width: 95%;
+        }
+        
+        /* Animaciones */
+        .container {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="background-pattern"></div>
-    <div class="progress-bar" id="progress-bar"></div>
-    
     <div class="container">
-        <!-- Botones de utilidad -->
-        <div class="utility-buttons">
-            <button class="utility-btn random" id="random-btn" title="Generar datos aleatorios">
-                <i class="fas fa-dice"></i>
-            </button>
-            <button class="utility-btn help" id="help-btn" title="Ayuda">
-                <i class="fas fa-question"></i>
-            </button>
-        </div>
-
         <div class="header">
-            <div class="header-icon">
-                <i class="fas fa-gem"></i>
-            </div>
-            <h1>Predictor de Precio</h1>
-            <p class="subtitle">Circonia Cúbica Premium</p>
+            <h1>Predictor de Supervivencia del Titanic</h1>
+            <p class="subtitle">Descubre las probabilidades de supervivencia en el histórico naufragio</p>
         </div>
-
-        <form id="formulario">
-            <div class="form-grid">
-                <!-- Primera fila: Características principales -->
+        
+        <form id="titanicForm">
+            <div class="grid">
                 <div class="form-group">
-                    <label class="form-label" for="carat">
-                        <i class="fas fa-weight"></i> Quilates
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="number" 
-                            id="carat" 
-                            class="form-input" 
-                            step="0.01" 
-                            min="0.1" 
-                            max="5" 
-                            placeholder="0.50" 
-                            required
-                        >
-                        <i class="fas fa-balance-scale input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="carat-message"></div>
+                    <label for="pclass">Clase del Boleto:</label>
+                    <select id="pclass" name="pclass" required>
+                        <option value="">Seleccionar clase...</option>
+                        <option value="1">Primera Clase (Lujo)</option>
+                        <option value="2">Segunda Clase (Intermedio)</option>
+                        <option value="3">Tercera Clase (Económico)</option>
+                    </select>
                 </div>
-
+                
                 <div class="form-group">
-                    <label class="form-label" for="depth">
-                        <i class="fas fa-arrows-alt-v"></i> Profundidad
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="number" 
-                            id="depth" 
-                            class="form-input" 
-                            step="0.1" 
-                            min="40" 
-                            max="80" 
-                            placeholder="61.5%" 
-                            required
-                        >
-                        <i class="fas fa-ruler-vertical input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="depth-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="table">
-                        <i class="fas fa-table"></i> Mesa
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="number" 
-                            id="table" 
-                            class="form-input" 
-                            step="0.1" 
-                            min="40" 
-                            max="80" 
-                            placeholder="55.0%" 
-                            required
-                        >
-                        <i class="fas fa-square input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="table-message"></div>
-                </div>
-
-                <!-- Segunda fila: Dimensiones físicas -->
-                <div class="form-group">
-                    <label class="form-label" for="x">
-                        <i class="fas fa-arrows-alt-h"></i> Longitud
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="number" 
-                            id="x" 
-                            class="form-input" 
-                            step="0.01" 
-                            min="1" 
-                            max="15" 
-                            placeholder="4.05 mm" 
-                            required
-                        >
-                        <i class="fas fa-ruler-horizontal input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="x-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="y">
-                        <i class="fas fa-expand-arrows-alt"></i> Anchura
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="number" 
-                            id="y" 
-                            class="form-input" 
-                            step="0.01" 
-                            min="1" 
-                            max="15" 
-                            placeholder="4.07 mm" 
-                            required
-                        >
-                        <i class="fas fa-arrows-alt input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="y-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="z">
-                        <i class="fas fa-arrows-alt-v"></i> Altura
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="number" 
-                            id="z" 
-                            class="form-input" 
-                            step="0.01" 
-                            min="1" 
-                            max="10" 
-                            placeholder="2.31 mm" 
-                            required
-                        >
-                        <i class="fas fa-ruler input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="z-message"></div>
-                </div>
-
-                <!-- Tercera fila: Características de calidad -->
-                <div class="form-group">
-                    <label class="form-label" for="cut">
-                        <i class="fas fa-cut"></i> Tipo de Corte
-                    </label>
-                    <div class="input-wrapper">
-                        <select id="cut" class="form-select" required>
-                            <option value="">Seleccionar corte</option>
-                            <option value="Fair">Fair</option>
-                            <option value="Good">Good</option>
-                            <option value="Very Good">Very Good</option>
-                            <option value="Premium">Premium</option>
-                            <option value="Ideal">Ideal</option>
-                        </select>
-                        <i class="fas fa-chevron-down input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="cut-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="color">
-                        <i class="fas fa-palette"></i> Color
-                    </label>
-                    <div class="input-wrapper">
-                        <select id="color" class="form-select" required>
-                            <option value="">Seleccionar color</option>
-                            <option value="D">D (Incoloro)</option>
-                            <option value="E">E (Incoloro)</option>
-                            <option value="F">F (Incoloro)</option>
-                            <option value="G">G (Casi incoloro)</option>
-                            <option value="H">H (Casi incoloro)</option>
-                            <option value="I">I (Casi incoloro)</option>
-                            <option value="J">J (Casi incoloro)</option>
-                        </select>
-                        <i class="fas fa-chevron-down input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="color-message"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="clarity">
-                        <i class="fas fa-eye"></i> Claridad
-                    </label>
-                    <div class="input-wrapper">
-                        <select id="clarity" class="form-select" required>
-                            <option value="">Seleccionar claridad</option>
-                            <option value="I1">I1 (Imperfecciones visibles)</option>
-                            <option value="SI2">SI2 (Pequeñas imperfecciones)</option>
-                            <option value="SI1">SI1 (Pequeñas imperfecciones)</option>
-                            <option value="VS2">VS2 (Muy pequeñas imperfecciones)</option>
-                            <option value="VS1">VS1 (Muy pequeñas imperfecciones)</option>
-                            <option value="VVS2">VVS2 (Imperfecciones muy, muy pequeñas)</option>
-                            <option value="VVS1">VVS1 (Imperfecciones muy, muy pequeñas)</option>
-                            <option value="IF">IF (Internamente perfecto)</option>
-                        </select>
-                        <i class="fas fa-chevron-down input-icon"></i>
-                    </div>
-                    <div class="validation-message" id="clarity-message"></div>
-                </div>
-
-                <!-- Cuarta fila: Modelo de predicción y información adicional -->
-                <div class="form-group">
-                    <label class="form-label" for="modelo">
-                        <i class="fas fa-brain"></i> Modelo de Predicción
-                    </label>
-                    <div class="input-wrapper">
-                        <select id="modelo" class="form-select">
-                            <option value="rf">Random Forest</option>
-                            <option value="mlp">Red Neuronal</option>
-                        </select>
-                        <i class="fas fa-chevron-down input-icon"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-cube"></i> Volumen Calculado
-                    </label>
-                    <div class="input-wrapper">
-                        <input 
-                            type="text" 
-                            id="volume-display" 
-                            class="form-input" 
-                            placeholder="Se calcula automáticamente" 
-                            readonly
-                            style="background: rgba(51, 65, 85, 0.3); cursor: not-allowed;"
-                        >
-                        <i class="fas fa-calculator input-icon"></i>
-                    </div>
-                    <div class="validation-message success show">Calculado automáticamente: X × Y × Z</div>
+                    <label for="sex">Sexo:</label>
+                    <select id="sex" name="sex" required>
+                        <option value="">Seleccionar sexo...</option>
+                        <option value="male">Masculino</option>
+                        <option value="female">Femenino</option>
+                    </select>
                 </div>
             </div>
-
-            <button type="submit" class="btn-predict" id="predict-btn">
-                <span class="btn-text">
-                    <i class="fas fa-calculator"></i> Predecir Precio
-                </span>
-                <div class="btn-loader">
-                    <div class="spinner"></div>
+            
+            <div class="grid-3">
+                <div class="form-group">
+                    <label for="age">Edad:</label>
+                    <input type="number" id="age" name="age" min="0" max="100" step="1" placeholder="Ej: 29" required>
                 </div>
-            </button>
-        </form>
-
-        <div id="resultado" class="result-card">
-            <i class="result-icon fas fa-dollar-sign"></i>
-            <div class="result-price" id="price-display">0.00</div>
-            <div class="result-model" id="model-display"></div>
-        </div>
-
-        <div class="debug-section">
-            <button type="button" class="debug-toggle" onclick="toggleDebug()">
-                <i class="fas fa-cog"></i>
-                <span id="debug-toggle-text">Mostrar información técnica</span>
-            </button>
-            <div id="debug-info" class="debug-info"></div>
-        </div>
-    </div>
-
-    <!-- Modal de ayuda -->
-    <div class="modal-overlay" id="help-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Entendimiento del Problema</h2>
-                <button class="modal-close" onclick="closeHelpModal()">
-                    <i class="fas fa-times"></i>
+                
+                <div class="form-group">
+                    <label for="sibsp">Hermanos/Cónyuges:</label>
+                    <input type="number" id="sibsp" name="sibsp" min="0" max="10" step="1" placeholder="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parch">Padres/Hijos:</label>
+                    <input type="number" id="parch" name="parch" min="0" max="10" step="1" placeholder="0" required>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <div class="form-group">
+                    <label for="fare">Precio del Boleto (£):</label>
+                    <input type="number" id="fare" name="fare" min="0" step="0.01" placeholder="Ej: 32.50" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="embarked">Puerto de Embarque:</label>
+                    <select id="embarked" name="embarked" required>
+                        <option value="">Seleccionar puerto...</option>
+                        <option value="S">Southampton</option>
+                        <option value="C">Cherbourg</option>
+                        <option value="Q">Queenstown</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="random-btn" onclick="generarPasajeroAleatorio()">
+                    Generar Pasajero Aleatorio
+                </button>
+                <button type="submit" class="predict-btn" id="predictBtn">
+                    Predecir Supervivencia
                 </button>
             </div>
-            <div class="modal-body">
-                <h3>Objetivo del Proyecto</h3>
-                <p>Este sistema utiliza machine learning para predecir el precio de zirconias cúbicas basándose en sus características físicas y cualitativas.</p>
-
-                <h3>Variables de Entrada</h3>
-                <ul>
-                    <li><strong>Carat:</strong> Peso de la piedra en quilates (0.1 - 5.0)</li>
-                    <li><strong>Cut:</strong> Calidad del corte (Fair, Good, Very Good, Premium, Ideal)</li>
-                    <li><strong>Color:</strong> Grado de color desde D (incoloro) hasta J (amarillento)</li>
-                    <li><strong>Clarity:</strong> Claridad desde I1 (inclusiones visibles) hasta IF (internamente perfecto)</li>
-                    <li><strong>Depth & Table:</strong> Proporciones geométricas en porcentaje</li>
-                    <li><strong>X, Y, Z:</strong> Dimensiones físicas en milímetros</li>
-                </ul>
-
-                <h3>Modelos Disponibles</h3>
-                <ul>
-                    <li><strong>Random Forest:</strong> Mejor precisión (R² = 97.74%)</li>
-                    <li><strong>Red Neuronal:</strong> Alternativa (R² = 95.72%)</li>
-                </ul>
-
-                <h3>Características del Dataset</h3>
-                <ul>
-                    <li>26,967 zirconias cúbicas sintéticas</li>
-                    <li>Rango de precios: 326 - 18,818 unidades</li>
-                    <li>El volumen se calcula automáticamente (X × Y × Z)</li>
-                </ul>
-
-                <h3>Uso del Sistema</h3>
-                <p>1. Complete todos los campos requeridos</p>
-                <p>2. Use el botón de dados para generar datos aleatorios de prueba</p>
-                <p>3. El sistema validará automáticamente los rangos</p>
-                <p>4. Obtendrá una predicción precisa del valor estimado</p>
-            </div>
-        </div>
+        </form>
+        
+        <div id="result" class="result"></div>
     </div>
 
     <script>
-        // Configuración de validaciones
-        const validationRules = {
-            carat: { min: 0.1, max: 5.0, message: 'Los quilates deben estar entre 0.1 y 5.0' },
-            depth: { min: 40, max: 80, message: 'La profundidad debe estar entre 40 y 80%' },
-            table: { min: 40, max: 80, message: 'La mesa debe estar entre 40 y 80%' },
-            x: { min: 1, max: 15, message: 'La longitud debe estar entre 1 y 15 mm' },
-            y: { min: 1, max: 15, message: 'La anchura debe estar entre 1 y 15 mm' },
-            z: { min: 1, max: 10, message: 'La altura debe estar entre 1 y 10 mm' }
-        };
-
-        // Datos aleatorios para generar ejemplos
-        const randomData = {
-            cuts: ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal'],
-            colors: ['D', 'E', 'F', 'G', 'H', 'I', 'J'],
-            clarities: ['I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF']
-        };
-
-        // Generar datos aleatorios realistas
-        function generateRandomData() {
-            const carat = (Math.random() * 4.8 + 0.2).toFixed(2);
-            const depth = (Math.random() * 20 + 50).toFixed(1);
-            const table = (Math.random() * 20 + 50).toFixed(1);
+        // Generar pasajero aleatorio
+        function generarPasajeroAleatorio() {
+            const clases = [1, 2, 3];
+            const sexos = ['male', 'female'];
+            const puertos = ['S', 'C', 'Q'];
             
-            // Dimensiones proporcionales al peso
-            const baseSize = Math.sqrt(parseFloat(carat)) * 3;
-            const x = (baseSize + Math.random() * 0.5).toFixed(2);
-            const y = (baseSize + Math.random() * 0.5).toFixed(2);
-            const z = (baseSize * 0.6 + Math.random() * 0.3).toFixed(2);
+            // Generar datos más realistas
+            const pclass = clases[Math.floor(Math.random() * clases.length)];
+            const sex = sexos[Math.floor(Math.random() * sexos.length)];
             
-            const cut = randomData.cuts[Math.floor(Math.random() * randomData.cuts.length)];
-            const color = randomData.colors[Math.floor(Math.random() * randomData.colors.length)];
-            const clarity = randomData.clarities[Math.floor(Math.random() * randomData.clarities.length)];
-
-            return { carat, depth, table, x, y, z, cut, color, clarity };
-        }
-
-        // Llenar formulario con datos aleatorios
-        function fillRandomData() {
-            const data = generateRandomData();
+            // Edad realista por demografía del Titanic
+            const age = Math.floor(Math.random() * 70) + 1;
             
-            // Animar el llenado de campos
-            Object.entries(data).forEach((entry, index) => {
-                const [field, value] = entry;
+            // Familia (la mayoría viajaba sola)
+            const sibsp = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * 3);
+            const parch = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * 3);
+            
+            // Precio realista según la clase
+            let fare;
+            if (pclass === 1) {
+                fare = (Math.random() * 400 + 50).toFixed(2);
+            } else if (pclass === 2) {
+                fare = (Math.random() * 50 + 10).toFixed(2);
+            } else {
+                fare = (Math.random() * 20 + 3).toFixed(2);
+            }
+            
+            const embarked = puertos[Math.floor(Math.random() * puertos.length)];
+            
+            // Llenar el formulario con animación
+            const fields = [
+                {id: 'pclass', value: pclass},
+                {id: 'sex', value: sex},
+                {id: 'age', value: age},
+                {id: 'sibsp', value: sibsp},
+                {id: 'parch', value: parch},
+                {id: 'fare', value: fare},
+                {id: 'embarked', value: embarked}
+            ];
+            
+            fields.forEach((field, index) => {
                 setTimeout(() => {
-                    const element = document.getElementById(field);
-                    if (element) {
-                        element.value = value;
-                        element.style.transform = 'scale(1.05)';
-                        element.style.transition = 'transform 0.2s ease';
-                        
-                        // Validar el campo después de llenarlo
-                        if (element.type === 'number') {
-                            validateField(element);
-                        } else {
-                            validateSelect(element);
-                        }
-                        
-                        setTimeout(() => {
-                            element.style.transform = 'scale(1)';
-                        }, 200);
-                    }
+                    const element = document.getElementById(field.id);
+                    element.value = field.value;
+                    element.style.transform = 'scale(1.05)';
+                    element.style.borderColor = '#2c5aa0';
+                    
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                        element.style.borderColor = '#e1e5e9';
+                    }, 200);
                 }, index * 100);
             });
             
-            // Actualizar volumen después de llenar dimensiones
-            setTimeout(() => {
-                updateVolume();
-            }, 800);
-        }
-
-        // Modal de ayuda
-        function showHelpModal() {
-            document.getElementById('help-modal').classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeHelpModal() {
-            document.getElementById('help-modal').classList.remove('show');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Calcular y mostrar volumen automáticamente
-        function updateVolume() {
-            const x = parseFloat(document.getElementById('x').value) || 0;
-            const y = parseFloat(document.getElementById('y').value) || 0;
-            const z = parseFloat(document.getElementById('z').value) || 0;
-            
-            if (x > 0 && y > 0 && z > 0) {
-                const volume = (x * y * z).toFixed(3);
-                document.getElementById('volume-display').value = `${volume} mm³`;
-            } else {
-                document.getElementById('volume-display').value = '';
+            // Limpiar resultado anterior si existe
+            const result = document.getElementById('result');
+            if (result.style.display === 'block') {
+                result.style.opacity = '0.5';
             }
         }
-
-        // Validación en tiempo real
-        function setupRealTimeValidation() {
-            const inputs = document.querySelectorAll('.form-input:not([readonly])');
-            inputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    validateField(this);
-                    
-                    // Actualizar volumen si es una dimensión
-                    if (['x', 'y', 'z'].includes(this.id)) {
-                        updateVolume();
-                    }
-                });
-                
-                input.addEventListener('blur', function() {
-                    validateField(this);
-                });
-            });
-
-            const selects = document.querySelectorAll('.form-select');
-            selects.forEach(select => {
-                select.addEventListener('change', function() {
-                    validateSelect(this);
-                });
-            });
-        }
-
-        function validateField(field) {
-            const value = parseFloat(field.value);
-            const fieldName = field.id;
-            const rule = validationRules[fieldName];
-            const messageElement = document.getElementById(`${fieldName}-message`);
-
-            if (!field.value.trim()) {
-                showValidationMessage(messageElement, 'Este campo es requerido', 'error');
-                field.classList.remove('valid');
-                field.classList.add('invalid');
-                return false;
-            }
-
-            if (rule && (isNaN(value) || value < rule.min || value > rule.max)) {
-                showValidationMessage(messageElement, rule.message, 'error');
-                field.classList.remove('valid');
-                field.classList.add('invalid');
-                return false;
-            }
-
-            showValidationMessage(messageElement, 'Válido', 'success');
-            field.classList.remove('invalid');
-            field.classList.add('valid');
-            return true;
-        }
-
-        function validateSelect(select) {
-            const messageElement = document.getElementById(`${select.id}-message`);
+        
+        // Manejar el formulario
+        document.getElementById('titanicForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            if (!select.value) {
-                showValidationMessage(messageElement, 'Por favor selecciona una opción', 'error');
-                select.classList.remove('valid');
-                select.classList.add('invalid');
-                return false;
-            }
-
-            showValidationMessage(messageElement, 'Válido', 'success');
-            select.classList.remove('invalid');
-            select.classList.add('valid');
-            return true;
-        }
-
-        function showValidationMessage(element, message, type) {
-            element.textContent = message;
-            element.className = `validation-message show ${type}`;
-        }
-
-        function validateAllFields() {
-            const inputs = document.querySelectorAll('.form-input:not([readonly])');
-            const selects = document.querySelectorAll('.form-select[required]');
-            let isValid = true;
-
-            inputs.forEach(input => {
-                if (!validateField(input)) {
-                    isValid = false;
-                }
-            });
-
-            selects.forEach(select => {
-                if (!validateSelect(select)) {
-                    isValid = false;
-                }
-            });
-
-            return isValid;
-        }
-
-        function showProgressBar() {
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.style.width = '100%';
-            progressBar.classList.add('loading');
-        }
-
-        function hideProgressBar() {
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.classList.remove('loading');
-            setTimeout(() => {
-                progressBar.style.width = '0%';
-            }, 300);
-        }
-
-        function predecirPrecio(event) {
-            event.preventDefault();
-            
-            // Validar todos los campos
-            if (!validateAllFields()) {
-                showResult('Por favor corrige los errores antes de continuar', 'error', 'fas fa-exclamation-triangle');
-                return;
-            }
-
-            const form = document.getElementById('formulario');
-            const predictBtn = document.getElementById('predict-btn');
-            
-            // Preparar datos del formulario
-            const formData = new FormData();
-            const requiredFields = ['carat', 'depth', 'table', 'x', 'y', 'z', 'cut', 'color', 'clarity'];
-            
-            requiredFields.forEach(field => {
-                formData.append(field, document.getElementById(field).value);
-            });
-            formData.append('modelo', document.getElementById('modelo').value);
+            const btn = document.getElementById('predictBtn');
+            const result = document.getElementById('result');
             
             // Estado de carga
-            predictBtn.disabled = true;
-            predictBtn.classList.add('loading');
-            showProgressBar();
-            showResult('Analizando características de la circonia...', 'loading', 'fas fa-search');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Analizando...';
+            result.style.display = 'block';
+            result.className = 'result loading';
+            result.innerHTML = 'Analizando el perfil del pasajero...';
             
-            // Realizar petición
-            fetch('/predict', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                // Obtener datos del formulario
+                const formData = new FormData(this);
+                
+                // Enviar a la API
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
                 setTimeout(() => {
-                    hideProgressBar();
-                    
                     if (data.error) {
-                        showResult(data.error, 'error', 'fas fa-exclamation-circle');
-                        console.error('Error del servidor:', data.error);
+                        // Error
+                        result.className = 'result error';
+                        result.innerHTML = `<strong>Error:</strong><br>${data.error}`;
                     } else {
-                        const precio = parseFloat(data.precio_estimado).toFixed(2);
-                        const modeloUsado = data.modelo_usado || 'Modelo desconocido';
+                        // Éxito
+                        const sobrevive = data.sobrevive;
+                        const probabilidad = (data.probabilidad * 100).toFixed(1);
+                        const confianza = (data.confianza * 100).toFixed(1);
                         
-                        showResult(
-                            precio,
-                            'success',
-                            'fas fa-check-circle',
-                            `Predicción realizada con ${modeloUsado}`
-                        );
-                        
-                        // Actualizar información de debug si está visible
-                        updateDebugInfo(data);
+                        if (sobrevive) {
+                            result.className = 'result success';
+                            result.innerHTML = `
+                                <strong>${data.resultado}</strong><br>
+                                <div style="margin-top: 15px; font-size: 16px;">
+                                    <strong>Probabilidad de supervivencia:</strong> ${probabilidad}%<br>
+                                    <strong>Nivel de confianza:</strong> ${confianza}%<br>
+                                    <strong>Este pasajero tenía buenas chances de sobrevivir</strong>
+                                </div>
+                            `;
+                        } else {
+                            result.className = 'result danger';
+                            result.innerHTML = `
+                                <strong>${data.resultado}</strong><br>
+                                <div style="margin-top: 15px; font-size: 16px;">
+                                    <strong>Probabilidad de supervivencia:</strong> ${probabilidad}%<br>
+                                    <strong>Nivel de confianza:</strong> ${confianza}%<br>
+                                    <strong>Este pasajero tenía pocas chances de sobrevivir</strong>
+                                </div>
+                            `;
+                        }
                     }
                     
-                    predictBtn.disabled = false;
-                    predictBtn.classList.remove('loading');
-                }, 1000);
-            })
-            .catch(error => {
+                    // Restaurar botón
+                    btn.disabled = false;
+                    btn.innerHTML = 'Predecir Supervivencia';
+                }, 800);
+                
+            } catch (error) {
                 setTimeout(() => {
-                    hideProgressBar();
-                    showResult(
-                        'Error de conexión. Verifica que el servidor Flask esté ejecutándose en el puerto 5000.',
-                        'error',
-                        'fas fa-wifi'
-                    );
-                    predictBtn.disabled = false;
-                    predictBtn.classList.remove('loading');
-                }, 1000);
-                console.error('Error de conexión:', error);
-            });
-        }
-
-        function showResult(message, type, icon, subtitle = '') {
-            const resultCard = document.getElementById('resultado');
-            const resultIcon = resultCard.querySelector('.result-icon');
-            const priceDisplay = document.getElementById('price-display');
-            const modelDisplay = document.getElementById('model-display');
-            
-            resultIcon.className = `result-icon ${icon}`;
-            
-            if (type === 'success') {
-                priceDisplay.textContent = message;
-                modelDisplay.textContent = subtitle;
-            } else {
-                priceDisplay.textContent = message;
-                priceDisplay.style.fontSize = '1.5rem';
-                modelDisplay.textContent = subtitle;
-            }
-            
-            resultCard.className = `result-card ${type} show`;
-            
-            // Reset font size for success
-            if (type === 'success') {
-                priceDisplay.style.fontSize = '2.5rem';
-            }
-        }
-
-        function toggleDebug() {
-            const debugInfo = document.getElementById('debug-info');
-            const toggleText = document.getElementById('debug-toggle-text');
-            
-            if (debugInfo.classList.contains('show')) {
-                debugInfo.classList.remove('show');
-                toggleText.textContent = 'Mostrar información técnica';
-            } else {
-                loadDebugInfo();
-                debugInfo.classList.add('show');
-                toggleText.textContent = 'Ocultar información técnica';
-            }
-        }
-
-        function loadDebugInfo() {
-            fetch('/debug')
-                .then(response => response.json())
-                .then(data => {
-                    const debugDiv = document.getElementById('debug-info');
-                    let html = '<strong>Información técnica del sistema:</strong><br><br>';
+                    result.className = 'result error';
+                    result.innerHTML = `
+                        <strong>Error de conexión</strong><br>
+                        <div style="margin-top: 10px; font-size: 16px;">
+                            Verifica que el servidor Flask esté ejecutándose en el puerto 5000
+                        </div>
+                    `;
+                    console.error('Error:', error);
                     
-                    html += `<strong>Estado de modelos:</strong><br>`;
-                    html += `• Random Forest: ${data.modelos_cargados?.random_forest ? 'Cargado' : 'Error'}<br>`;
-                    html += `• Red Neuronal: ${data.modelos_cargados?.red_neuronal ? 'Cargado' : 'Error'}<br><br>`;
-                    
-                    if (data.caracteristicas_requeridas) {
-                        html += `<strong>Características requeridas:</strong><br>`;
-                        html += `${data.caracteristicas_requeridas.join(', ')}<br><br>`;
-                        html += `<strong>Orden exacto:</strong><br>${data.orden_caracteristicas}<br>`;
-                    }
-                    
-                    debugDiv.innerHTML = html;
-                })
-                .catch(error => {
-                    document.getElementById('debug-info').innerHTML = 'Error cargando información técnica. Verifica que el servidor esté ejecutándose.';
-                    console.error('Error cargando debug:', error);
-                });
-        }
-
-        function updateDebugInfo(predictionData) {
-            if (predictionData.caracteristicas_usadas) {
-                const debugDiv = document.getElementById('debug-info');
-                if (debugDiv.classList.contains('show')) {
-                    const currentContent = debugDiv.innerHTML;
-                    debugDiv.innerHTML = currentContent + `<br><br><strong>Última predicción:</strong><br>Características usadas: ${predictionData.caracteristicas_usadas.join(', ')}`;
-                }
+                    // Restaurar botón
+                    btn.disabled = false;
+                    btn.innerHTML = 'Predecir Supervivencia';
+                }, 800);
             }
-        }
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            setupRealTimeValidation();
-            
-            // Event listeners
-            document.getElementById('formulario').addEventListener('submit', predecirPrecio);
-            
-            // Botón de datos aleatorios
-            document.getElementById('random-btn').addEventListener('click', fillRandomData);
-            
-            // Botón de ayuda
-            document.getElementById('help-btn').addEventListener('click', showHelpModal);
-            
-            // Cerrar modal al hacer clic fuera
-            document.getElementById('help-modal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeHelpModal();
-                }
-            });
-            
-            // Cerrar modal con ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeHelpModal();
-                }
-            });
-            
-            // Limpiar resultado al cambiar inputs
-            document.querySelectorAll('.form-input:not([readonly]), .form-select').forEach(element => {
-                element.addEventListener('input', function() {
-                    const resultCard = document.getElementById('resultado');
-                    if (resultCard.classList.contains('show')) {
-                        resultCard.style.opacity = '0.6';
-                    }
-                });
-            });
-            
-            console.log('Predictor de Precio de Circonia cargado');
-            console.log('Características requeridas: volume, clarity_encoded, carat, color_encoded, depth, table');
         });
+        
+        console.log('Predictor Titanic cargado');
     </script>
 </body>
 </html>

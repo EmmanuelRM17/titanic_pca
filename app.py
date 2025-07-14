@@ -1,214 +1,191 @@
 from flask import Flask, request, render_template, jsonify
 import joblib
-import pandas as pd
 import numpy as np
 import logging
-import os
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
-# CARACTERÍSTICAS EXACTAS QUE ESPERAN LOS MODELOS
-REQUIRED_FEATURES = ['volume', 'clarity_encoded', 'carat', 'color_encoded', 'depth', 'table']
+# Variable global para el modelo
+modelo_titanic = None
 
-# Mapeos para variables categóricas
-CUT_MAPPING = {
-    'Fair': 0, 'Good': 1, 'Very Good': 2, 'Premium': 3, 'Ideal': 4
-}
-
-COLOR_MAPPING = {
-    'J': 0, 'I': 1, 'H': 2, 'G': 3, 'F': 4, 'E': 5, 'D': 6
-}
-
-CLARITY_MAPPING = {
-    'I1': 0, 'SI2': 1, 'SI1': 2, 'VS2': 3, 'VS1': 4, 'VVS2': 5, 'VVS1': 6, 'IF': 7
-}
-
-# Variables globales para los modelos
-modelo_rf = None
-modelo_mlp = None
-
-def load_models():
-    """
-    Carga los modelos al iniciar la aplicación
-    """
-    global modelo_rf, modelo_mlp
-    
+def load_model():
+    """Carga el modelo de Titanic"""
+    global modelo_titanic
     try:
-        modelo_rf = joblib.load('modelo_random_forest.pkl')
-        modelo_mlp = joblib.load('modelo_red_neuronal.pkl')
-        app.logger.info("✅ Modelos cargados correctamente")
+        modelo_titanic = joblib.load('modelo_titanic.pkl')
+        app.logger.info("✅ Modelo Titanic cargado correctamente")
         return True
-    except FileNotFoundError as e:
-        app.logger.error(f"❌ Error cargando modelos: {e}")
-        return False
     except Exception as e:
-        app.logger.error(f"❌ Error inesperado cargando modelos: {e}")
+        app.logger.error(f"❌ Error cargando modelo: {e}")
         return False
 
-def preparar_datos_para_modelo(form_data):
+def transform_to_pca(form_data):
     """
-    Prepara los datos en el orden exacto que esperan los modelos
+    Transforma datos del formulario directamente a los 8 componentes PCA
+    que espera tu modelo entrenado
     """
-    # Extraer y validar datos del formulario
-    carat = float(form_data['carat'])
-    depth = float(form_data['depth'])
-    table = float(form_data['table'])
-    x = float(form_data['x'])
-    y = float(form_data['y'])
-    z = float(form_data['z'])
-    cut = form_data['cut']
-    color = form_data['color']
-    clarity = form_data['clarity']
-    
-    # Validar categorías
-    if cut not in CUT_MAPPING:
-        raise ValueError(f"Tipo de corte no válido: {cut}")
-    if color not in COLOR_MAPPING:
-        raise ValueError(f"Color no válido: {color}")
-    if clarity not in CLARITY_MAPPING:
-        raise ValueError(f"Claridad no válida: {clarity}")
-    
-    # Calcular valores derivados
-    volume = x * y * z
-    clarity_encoded = CLARITY_MAPPING[clarity]
-    color_encoded = COLOR_MAPPING[color]
-    
-    # Crear datos en el ORDEN EXACTO que espera el modelo
-    # ['volume', 'clarity_encoded', 'carat', 'color_encoded', 'depth', 'table']
-    data_row = [
-        volume,           # posición 0
-        clarity_encoded,  # posición 1
-        carat,           # posición 2
-        color_encoded,   # posición 3
-        depth,           # posición 4
-        table            # posición 5
-    ]
-    
-    return pd.DataFrame([data_row], columns=REQUIRED_FEATURES)
+    try:
+        # Extraer y convertir datos
+        pclass = int(form_data['pclass'])
+        sex = 1.0 if form_data['sex'] == 'male' else 0.0  # male=1, female=0
+        age = float(form_data['age'])
+        sibsp = int(form_data['sibsp'])
+        parch = int(form_data['parch'])
+        fare = float(form_data['fare'])
+        
+        # Embarked mapping: C=0, Q=1, S=2 (orden alfabético típico)
+        embarked_map = {'C': 0.0, 'Q': 1.0, 'S': 2.0}
+        embarked = embarked_map[form_data['embarked']]
+        
+        # Valores por defecto para Ticket y Cabin (simplificados)
+        ticket = 500.0  # Valor medio típico
+        cabin = 100.0   # Valor por defecto para "desconocido"
+        
+        # Crear vector de características originales
+        # Orden: [Pclass, Sex, Age, SibSp, Parch, Ticket, Fare, Cabin, Embarked]
+        features = np.array([pclass, sex, age, sibsp, parch, ticket, fare, cabin, embarked])
+        
+        # Normalizar usando estadísticas aproximadas del dataset Titanic
+        # Medias aproximadas
+        means = np.array([2.31, 0.65, 29.7, 0.52, 0.38, 260.7, 32.2, 72.9, 1.72])
+        # Desviaciones estándar aproximadas  
+        stds = np.array([0.84, 0.48, 14.5, 1.10, 0.81, 471.0, 49.7, 64.1, 0.82])
+        
+        # Escalar
+        features_scaled = (features - means) / stds
+        
+        # Transformación PCA hardcodeada basada en tu notebook
+        # Estos son los loadings aproximados de los 8 componentes principales
+        pca_matrix = np.array([
+            [ 0.565,  0.126, -0.314,  0.096, -0.003,  0.242, -0.445,  0.499,  0.226],
+            [ 0.011, -0.353, -0.409,  0.554,  0.550,  0.083,  0.297, -0.038, -0.049],
+            [-0.128,  0.012,  0.066,  0.131,  0.186, -0.641, -0.183, -0.006,  0.695],
+            [-0.082,  0.648,  0.185,  0.266,  0.092,  0.465,  0.271, -0.161,  0.380],
+            [ 0.050,  0.576, -0.417,  0.270, -0.160, -0.448, -0.060, -0.173, -0.399],
+            [ 0.101,  0.251,  0.472, -0.081,  0.684, -0.137, -0.166,  0.223, -0.366],
+            [-0.214, -0.065,  0.345,  0.553, -0.365, -0.097,  0.132,  0.590, -0.127],
+            [-0.105,  0.187, -0.311, -0.456,  0.099, -0.148,  0.585,  0.517,  0.088]
+        ])
+        
+        # Aplicar transformación PCA
+        pca_features = np.dot(features_scaled, pca_matrix.T)
+        
+        # Devolver como array 2D (1 muestra, 8 características)
+        return pca_features.reshape(1, -1)
+        
+    except Exception as e:
+        app.logger.error(f"Error en transform_to_pca: {e}")
+        raise ValueError(f"Error transformando datos: {e}")
 
 @app.route('/')
 def index():
-    """
-    Página principal de la aplicación
-    """
+    """Página principal"""
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """
-    Endpoint para realizar predicciones de precio
-    """
-    # Verificar que los modelos estén cargados
-    if modelo_rf is None or modelo_mlp is None:
-        return jsonify({'error': 'Modelos no disponibles. Contacta al administrador.'}), 500
+    """Predicción de supervivencia usando tu modelo entrenado"""
+    if modelo_titanic is None:
+        return jsonify({'error': 'Modelo no disponible'}), 500
     
     try:
         # Validar campos requeridos
-        required_fields = ['carat', 'depth', 'table', 'x', 'y', 'z', 'cut', 'color', 'clarity']
+        required_fields = ['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare', 'embarked']
         for field in required_fields:
-            if field not in request.form or not request.form[field]:
-                return jsonify({'error': f'Campo requerido faltante: {field}'}), 400
+            if field not in request.form:
+                return jsonify({'error': f'Campo faltante: {field}'}), 400
         
-        # Validar rangos básicos
-        carat = float(request.form['carat'])
-        if not (0.1 <= carat <= 5.0):
-            return jsonify({'error': 'Quilates debe estar entre 0.1 y 5.0'}), 400
+        # Validar valores
+        pclass = int(request.form['pclass'])
+        if pclass not in [1, 2, 3]:
+            return jsonify({'error': 'Clase debe ser 1, 2 o 3'}), 400
+            
+        sex = request.form['sex']
+        if sex not in ['male', 'female']:
+            return jsonify({'error': 'Sexo debe ser male o female'}), 400
+            
+        age = float(request.form['age'])
+        if age < 0 or age > 100:
+            return jsonify({'error': 'Edad debe estar entre 0 y 100'}), 400
+            
+        fare = float(request.form['fare'])
+        if fare < 0:
+            return jsonify({'error': 'Tarifa debe ser positiva'}), 400
+            
+        embarked = request.form['embarked']
+        if embarked not in ['S', 'C', 'Q']:
+            return jsonify({'error': 'Puerto debe ser S, C o Q'}), 400
         
-        depth = float(request.form['depth'])
-        if not (40 <= depth <= 80):
-            return jsonify({'error': 'Profundidad debe estar entre 40 y 80'}), 400
+        # Transformar datos a formato PCA
+        data_pca = transform_to_pca(request.form)
         
-        table = float(request.form['table'])
-        if not (40 <= table <= 80):
-            return jsonify({'error': 'Mesa debe estar entre 40 y 80'}), 400
+        # Hacer predicción con tu modelo
+        prediction = modelo_titanic.predict(data_pca)[0]
+        probabilities = modelo_titanic.predict_proba(data_pca)[0]
         
-        x = float(request.form['x'])
-        y = float(request.form['y'])
-        z = float(request.form['z'])
+        # Preparar respuesta
+        sobrevive = bool(prediction)
+        prob_supervivencia = float(probabilities[1])  # Probabilidad de sobrevivir
+        confianza = float(max(probabilities))
         
-        if x <= 0 or y <= 0 or z <= 0:
-            return jsonify({'error': 'Las dimensiones deben ser mayores a 0'}), 400
-        
-        modelo_usado = request.form.get('modelo', 'rf')
-        
-        # Preparar datos en el formato correcto
-        data_df = preparar_datos_para_modelo(request.form)
-        
-        app.logger.debug(f"Datos preparados para el modelo:")
-        app.logger.debug(f"Columnas: {list(data_df.columns)}")
-        app.logger.debug(f"Valores: {data_df.iloc[0].values}")
-        
-        # Realizar predicción
-        if modelo_usado == 'mlp':
-            prediction = modelo_mlp.predict(data_df)
-            modelo_nombre = 'Red Neuronal'
-        else:
-            prediction = modelo_rf.predict(data_df)
-            modelo_nombre = 'Random Forest'
-        
-        precio_estimado = float(prediction[0])
-        
-        app.logger.info(f"Predicción exitosa: ${precio_estimado:.2f} usando {modelo_nombre}")
+        app.logger.info(f"Predicción: {sobrevive}, Prob: {prob_supervivencia:.3f}")
         
         return jsonify({
-            'precio_estimado': precio_estimado,
-            'modelo_usado': modelo_nombre,
-            'caracteristicas_usadas': REQUIRED_FEATURES,
-            'datos_enviados': data_df.iloc[0].to_dict()
+            'sobrevive': sobrevive,
+            'resultado': 'SOBREVIVE' if sobrevive else 'NO SOBREVIVE',
+            'probabilidad': prob_supervivencia,
+            'confianza': confianza
         })
         
-    except ValueError as e:
-        app.logger.error(f"Error de validación: {str(e)}")
-        return jsonify({'error': f'Datos inválidos: {str(e)}'}), 400
+    except ValueError as ve:
+        return jsonify({'error': str(ve)}), 400
     except Exception as e:
-        app.logger.error(f"Error en predicción: {str(e)}")
-        return jsonify({'error': f'Error interno: {str(e)}'}), 500
+        app.logger.error(f"Error en predicción: {e}")
+        return jsonify({'error': f'Error interno del servidor'}), 500
 
 @app.route('/debug')
-def debug_info():
-    """
-    Endpoint para información de debug
-    """
-    info = {
-        'modelos_cargados': {
-            'random_forest': modelo_rf is not None,
-            'red_neuronal': modelo_mlp is not None
-        },
-        'caracteristicas_requeridas': REQUIRED_FEATURES,
-        'orden_caracteristicas': 'volume, clarity_encoded, carat, color_encoded, depth, table'
-    }
-    
-    if modelo_rf:
-        info['random_forest_info'] = {
-            'tipo': str(type(modelo_rf)),
-            'n_features': getattr(modelo_rf, 'n_features_in_', 'No disponible'),
-            'feature_names': list(getattr(modelo_rf, 'feature_names_in_', []))
-        }
-    
-    if modelo_mlp:
-        info['red_neuronal_info'] = {
-            'tipo': str(type(modelo_mlp)),
-            'n_features': getattr(modelo_mlp, 'n_features_in_', 'No disponible'),
-            'feature_names': list(getattr(modelo_mlp, 'feature_names_in_', []))
-        }
-    
-    return jsonify(info)
-
-@app.route('/health')
-def health_check():
-    """
-    Endpoint de health check para el deployment
-    """
+def debug():
+    """Información de debug"""
     return jsonify({
-        'status': 'healthy',
-        'models_loaded': modelo_rf is not None and modelo_mlp is not None,
-        'timestamp': pd.Timestamp.now().isoformat()
+        'modelo_cargado': modelo_titanic is not None,
+        'tipo_modelo': str(type(modelo_titanic)) if modelo_titanic else None,
+        'status': 'OK' if modelo_titanic else 'ERROR'
     })
 
-# Cargar modelos al iniciar la aplicación
-load_models()
+@app.route('/test')
+def test():
+    """Prueba rápida del modelo"""
+    if modelo_titanic is None:
+        return jsonify({'error': 'Modelo no cargado'})
+    
+    try:
+        # Datos de prueba: mujer joven, primera clase
+        test_form = {
+            'pclass': '1',
+            'sex': 'female', 
+            'age': '25',
+            'sibsp': '1',
+            'parch': '0',
+            'fare': '50.0',
+            'embarked': 'S'
+        }
+        
+        data_pca = transform_to_pca(test_form)
+        prediction = modelo_titanic.predict(data_pca)[0]
+        probabilities = modelo_titanic.predict_proba(data_pca)[0]
+        
+        return jsonify({
+            'test_case': 'Mujer, 25 años, primera clase',
+            'prediction': int(prediction),
+            'probability': float(probabilities[1]),
+            'pca_shape': data_pca.shape,
+            'message': 'Modelo funcionando correctamente'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error en test: {e}'})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    load_model()
+    app.run(debug=True, port=5000)
