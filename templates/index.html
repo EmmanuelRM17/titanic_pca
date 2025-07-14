@@ -198,11 +198,6 @@
             border-color: rgba(52, 73, 94, 0.3);
         }
         
-        .optional {
-            opacity: 0.8;
-            font-style: italic;
-        }
-        
         .spinner {
             display: inline-block;
             width: 20px;
@@ -282,14 +277,19 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="embarked">Puerto de Embarque:</label>
-                        <select id="embarked" name="embarked" required>
-                            <option value="">Seleccionar...</option>
-                            <option value="S">Southampton (S)</option>
-                            <option value="C">Cherbourg (C)</option>
-                            <option value="Q">Queenstown (Q)</option>
-                        </select>
+                        <label for="cabin">Cabina:</label>
+                        <input type="text" id="cabin" name="cabin" placeholder="Ej: C85">
                     </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="embarked">Puerto de Embarque:</label>
+                    <select id="embarked" name="embarked" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="S">Southampton (S)</option>
+                        <option value="C">Cherbourg (C)</option>
+                        <option value="Q">Queenstown (Q)</option>
+                    </select>
                 </div>
             </div>
 
@@ -308,21 +308,6 @@
                 </div>
             </div>
 
-            <!-- Campos complementarios -->
-            <div class="form-section">
-                <h3 class="section-title">Información Adicional (Opcional)</h3>
-                <div class="grid">
-                    <div class="form-group">
-                        <label for="name" class="optional">Nombre Completo:</label>
-                        <input type="text" id="name" name="name" placeholder="Ej: Smith, Mr. John (opcional)" class="optional">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cabin" class="optional">Cabina:</label>
-                        <input type="text" id="cabin" name="cabin" placeholder="Ej: C85 (opcional)" class="optional">
-                    </div>
-                </div>
-            </div>
             
             <div class="btn-container">
                 <button type="button" class="random-btn" onclick="generarPasajeroAleatorio()">
@@ -340,13 +325,6 @@
     <script>
         function generarPasajeroAleatorio() {
             // Datos basados en estadísticas reales del Titanic
-            const nombres = [
-                "Smith, Mr. John", "Johnson, Mrs. Mary", "Brown, Miss. Sarah",
-                "Williams, Master. Thomas", "Jones, Mrs. Elizabeth", "Miller, Mr. David",
-                "Davis, Miss. Emma", "Garcia, Mr. Carlos", "Rodriguez, Mrs. Maria",
-                "Wilson, Mr. James", "Martinez, Miss. Ana", "Anderson, Mrs. Linda"
-            ];
-            
             const tickets = [
                 "A/5 21171", "PC 17599", "STON/O2. 3101282", "113803", "373450",
                 "17463", "349909", "2649", "19950", "330923", "A/4. 39886"
@@ -364,7 +342,6 @@
             const sibsp = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * 3);
             const parch = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * 3);
             const embarked = ['S', 'C', 'Q'][Math.floor(Math.random() * 3)];
-            const name = nombres[Math.floor(Math.random() * nombres.length)];
             const ticket = tickets[Math.floor(Math.random() * tickets.length)];
             const cabin = cabinas[Math.floor(Math.random() * cabinas.length)];
             
@@ -387,9 +364,8 @@
                 {id: 'parch', value: parch},
                 {id: 'fare', value: fare},
                 {id: 'ticket', value: ticket},
-                {id: 'embarked', value: embarked},
-                {id: 'name', value: name},
-                {id: 'cabin', value: cabin}
+                {id: 'cabin', value: cabin},
+                {id: 'embarked', value: embarked}
             ];
             
             fields.forEach((field, index) => {
