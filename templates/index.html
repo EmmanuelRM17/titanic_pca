@@ -28,7 +28,7 @@
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             border: 1px solid rgba(255,255,255,0.2);
         }
@@ -49,6 +49,23 @@
             color: #7f8c8d;
             font-size: 1rem;
             margin-bottom: 25px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(248, 249, 250, 0.7);
+            border-radius: 15px;
+            border: 1px solid rgba(233, 236, 239, 0.8);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #2c5aa0;
+            padding-bottom: 8px;
         }
         
         .form-group {
@@ -81,8 +98,16 @@
             transform: translateY(-2px);
         }
         
-        input:hover, select:hover {
-            border-color: #bdc3c7;
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
         }
         
         .btn-container {
@@ -135,8 +160,6 @@
         .predict-btn:disabled {
             background: linear-gradient(135deg, #bdc3c7, #95a5a6);
             cursor: not-allowed;
-            transform: none;
-            box-shadow: 0 4px 15px rgba(189, 195, 199, 0.3);
         }
         
         .result {
@@ -155,21 +178,18 @@
             background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(46, 204, 113, 0.1));
             color: #27ae60;
             border-color: rgba(39, 174, 96, 0.3);
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.1);
         }
         
         .result.danger {
             background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
             color: #e74c3c;
             border-color: rgba(231, 76, 60, 0.3);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1);
         }
         
         .result.error {
             background: linear-gradient(135deg, rgba(241, 196, 15, 0.1), rgba(230, 126, 34, 0.1));
             color: #f39c12;
             border-color: rgba(241, 196, 15, 0.3);
-            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.1);
         }
         
         .result.loading {
@@ -178,88 +198,11 @@
             border-color: rgba(52, 73, 94, 0.3);
         }
         
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+        .optional {
+            opacity: 0.8;
+            font-style: italic;
         }
         
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 25px;
-                border-radius: 15px;
-            }
-            
-            .grid, .grid-3 {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .btn-container {
-                flex-direction: column;
-            }
-            
-            .random-btn {
-                width: 100%;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            body {
-                padding: 15px;
-            }
-            
-            .container {
-                padding: 25px 20px;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-        }
-        
-        /* Animaciones */
-        .container {
-            animation: slideUp 0.6s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .result {
-            animation: fadeIn 0.4s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        /* Loading spinner */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -274,68 +217,110 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        @media (max-width: 768px) {
+            .grid, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 30px 25px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Predictor de Supervivencia del Titanic</h1>
-            <p class="subtitle">Descubre las probabilidades de supervivencia en el histórico naufragio</p>
+            <p class="subtitle">Basado en tu modelo de Machine Learning entrenado</p>
         </div>
         
         <form id="titanicForm">
-            <div class="grid">
-                <div class="form-group">
-                    <label for="pclass">Clase del Boleto:</label>
-                    <select id="pclass" name="pclass" required>
-                        <option value="">Seleccionar clase...</option>
-                        <option value="1">Primera Clase (Lujo)</option>
-                        <option value="2">Segunda Clase (Intermedio)</option>
-                        <option value="3">Tercera Clase (Económico)</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sex">Sexo:</label>
-                    <select id="sex" name="sex" required>
-                        <option value="">Seleccionar sexo...</option>
-                        <option value="male">Masculino</option>
-                        <option value="female">Femenino</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="grid-3">
-                <div class="form-group">
-                    <label for="age">Edad:</label>
-                    <input type="number" id="age" name="age" min="0" max="100" step="1" placeholder="Ej: 29" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sibsp">Hermanos/Cónyuges:</label>
-                    <input type="number" id="sibsp" name="sibsp" min="0" max="10" step="1" placeholder="0" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="parch">Padres/Hijos:</label>
-                    <input type="number" id="parch" name="parch" min="0" max="10" step="1" placeholder="0" required>
+            <!-- Campos REQUERIDOS por tu app.py -->
+            <div class="form-section">
+                <h3 class="section-title">Información Personal</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="sex">Sexo:</label>
+                        <select id="sex" name="sex" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="male">Masculino</option>
+                            <option value="female">Femenino</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Edad:</label>
+                        <input type="number" id="age" name="age" min="0" max="100" step="1" placeholder="Ej: 29" required>
+                    </div>
                 </div>
             </div>
-            
-            <div class="grid">
-                <div class="form-group">
-                    <label for="fare">Precio del Boleto (£):</label>
-                    <input type="number" id="fare" name="fare" min="0" step="0.01" placeholder="Ej: 32.50" required>
+
+            <div class="form-section">
+                <h3 class="section-title">Información del Boleto</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="pclass">Clase del Boleto:</label>
+                        <select id="pclass" name="pclass" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="1">Primera Clase (Lujo)</option>
+                            <option value="2">Segunda Clase (Intermedio)</option>
+                            <option value="3">Tercera Clase (Económico)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fare">Precio del Boleto (£):</label>
+                        <input type="number" id="fare" name="fare" min="0" step="0.01" placeholder="Ej: 32.50" required>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="embarked">Puerto de Embarque:</label>
-                    <select id="embarked" name="embarked" required>
-                        <option value="">Seleccionar puerto...</option>
-                        <option value="S">Southampton</option>
-                        <option value="C">Cherbourg</option>
-                        <option value="Q">Queenstown</option>
-                    </select>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="ticket">Número de Boleto:</label>
+                        <input type="text" id="ticket" name="ticket" placeholder="Ej: A/5 21171" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="embarked">Puerto de Embarque:</label>
+                        <select id="embarked" name="embarked" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="S">Southampton (S)</option>
+                            <option value="C">Cherbourg (C)</option>
+                            <option value="Q">Queenstown (Q)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">Información Familiar</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="sibsp">Hermanos/Cónyuges a bordo:</label>
+                        <input type="number" id="sibsp" name="sibsp" min="0" max="10" step="1" placeholder="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parch">Padres/Hijos a bordo:</label>
+                        <input type="number" id="parch" name="parch" min="0" max="10" step="1" placeholder="0" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campos complementarios -->
+            <div class="form-section">
+                <h3 class="section-title">Información Adicional (Opcional)</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="name" class="optional">Nombre Completo:</label>
+                        <input type="text" id="name" name="name" placeholder="Ej: Smith, Mr. John (opcional)" class="optional">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cabin" class="optional">Cabina:</label>
+                        <input type="text" id="cabin" name="cabin" placeholder="Ej: C85 (opcional)" class="optional">
+                    </div>
                 </div>
             </div>
             
@@ -353,24 +338,37 @@
     </div>
 
     <script>
-        // Generar pasajero aleatorio
         function generarPasajeroAleatorio() {
-            const clases = [1, 2, 3];
-            const sexos = ['male', 'female'];
-            const puertos = ['S', 'C', 'Q'];
+            // Datos basados en estadísticas reales del Titanic
+            const nombres = [
+                "Smith, Mr. John", "Johnson, Mrs. Mary", "Brown, Miss. Sarah",
+                "Williams, Master. Thomas", "Jones, Mrs. Elizabeth", "Miller, Mr. David",
+                "Davis, Miss. Emma", "Garcia, Mr. Carlos", "Rodriguez, Mrs. Maria",
+                "Wilson, Mr. James", "Martinez, Miss. Ana", "Anderson, Mrs. Linda"
+            ];
             
-            // Generar datos más realistas
-            const pclass = clases[Math.floor(Math.random() * clases.length)];
-            const sex = sexos[Math.floor(Math.random() * sexos.length)];
+            const tickets = [
+                "A/5 21171", "PC 17599", "STON/O2. 3101282", "113803", "373450",
+                "17463", "349909", "2649", "19950", "330923", "A/4. 39886"
+            ];
             
-            // Edad realista por demografía del Titanic
+            const cabinas = [
+                "C85", "C123", "E46", "G6", "C103", "D56", "A6", 
+                "B78", "D33", "B30", "", "", ""  // Incluye vacías
+            ];
+            
+            // Generar datos aleatorios realistas
+            const pclass = [1, 2, 3][Math.floor(Math.random() * 3)];
+            const sex = ['male', 'female'][Math.floor(Math.random() * 2)];
             const age = Math.floor(Math.random() * 70) + 1;
-            
-            // Familia (la mayoría viajaba sola)
             const sibsp = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * 3);
             const parch = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * 3);
+            const embarked = ['S', 'C', 'Q'][Math.floor(Math.random() * 3)];
+            const name = nombres[Math.floor(Math.random() * nombres.length)];
+            const ticket = tickets[Math.floor(Math.random() * tickets.length)];
+            const cabin = cabinas[Math.floor(Math.random() * cabinas.length)];
             
-            // Precio realista según la clase
+            // Precio realista según clase
             let fare;
             if (pclass === 1) {
                 fare = (Math.random() * 400 + 50).toFixed(2);
@@ -380,9 +378,7 @@
                 fare = (Math.random() * 20 + 3).toFixed(2);
             }
             
-            const embarked = puertos[Math.floor(Math.random() * puertos.length)];
-            
-            // Llenar el formulario con animación
+            // Llenar formulario con animación
             const fields = [
                 {id: 'pclass', value: pclass},
                 {id: 'sex', value: sex},
@@ -390,7 +386,10 @@
                 {id: 'sibsp', value: sibsp},
                 {id: 'parch', value: parch},
                 {id: 'fare', value: fare},
-                {id: 'embarked', value: embarked}
+                {id: 'ticket', value: ticket},
+                {id: 'embarked', value: embarked},
+                {id: 'name', value: name},
+                {id: 'cabin', value: cabin}
             ];
             
             fields.forEach((field, index) => {
@@ -406,15 +405,8 @@
                     }, 200);
                 }, index * 100);
             });
-            
-            // Limpiar resultado anterior si existe
-            const result = document.getElementById('result');
-            if (result.style.display === 'block') {
-                result.style.opacity = '0.5';
-            }
         }
         
-        // Manejar el formulario
         document.getElementById('titanicForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -426,13 +418,11 @@
             btn.innerHTML = '<span class="spinner"></span>Analizando...';
             result.style.display = 'block';
             result.className = 'result loading';
-            result.innerHTML = 'Analizando el perfil del pasajero...';
+            result.innerHTML = 'Procesando datos con tu modelo entrenado...';
             
             try {
-                // Obtener datos del formulario
                 const formData = new FormData(this);
                 
-                // Enviar a la API
                 const response = await fetch('/predict', {
                     method: 'POST',
                     body: formData
@@ -442,11 +432,9 @@
                 
                 setTimeout(() => {
                     if (data.error) {
-                        // Error
                         result.className = 'result error';
                         result.innerHTML = `<strong>Error:</strong><br>${data.error}`;
                     } else {
-                        // Éxito
                         const sobrevive = data.sobrevive;
                         const probabilidad = (data.probabilidad * 100).toFixed(1);
                         const confianza = (data.confianza * 100).toFixed(1);
@@ -457,8 +445,8 @@
                                 <strong>${data.resultado}</strong><br>
                                 <div style="margin-top: 15px; font-size: 16px;">
                                     <strong>Probabilidad de supervivencia:</strong> ${probabilidad}%<br>
-                                    <strong>Nivel de confianza:</strong> ${confianza}%<br>
-                                    <strong>Este pasajero tenía buenas chances de sobrevivir</strong>
+                                    <strong>Confianza del modelo:</strong> ${confianza}%<br>
+                                    <em>Este pasajero tenía buenas posibilidades de sobrevivir al naufragio</em>
                                 </div>
                             `;
                         } else {
@@ -467,14 +455,13 @@
                                 <strong>${data.resultado}</strong><br>
                                 <div style="margin-top: 15px; font-size: 16px;">
                                     <strong>Probabilidad de supervivencia:</strong> ${probabilidad}%<br>
-                                    <strong>Nivel de confianza:</strong> ${confianza}%<br>
-                                    <strong>Este pasajero tenía pocas chances de sobrevivir</strong>
+                                    <strong>Confianza del modelo:</strong> ${confianza}%<br>
+                                    <em>Este pasajero tenía pocas posibilidades de sobrevivir al naufragio</em>
                                 </div>
                             `;
                         }
                     }
                     
-                    // Restaurar botón
                     btn.disabled = false;
                     btn.innerHTML = 'Predecir Supervivencia';
                 }, 800);
@@ -488,16 +475,14 @@
                             Verifica que el servidor Flask esté ejecutándose en el puerto 5000
                         </div>
                     `;
-                    console.error('Error:', error);
                     
-                    // Restaurar botón
                     btn.disabled = false;
                     btn.innerHTML = 'Predecir Supervivencia';
                 }, 800);
             }
         });
         
-        console.log('Predictor Titanic cargado');
+        console.log('Predictor Titanic cargado - Compatible con tu modelo');
     </script>
 </body>
 </html>
